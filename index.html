@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stay Ready | Safety Roleplay</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <section class="welcome" id="welcome" aria-labelledby="welcome-title"><div class="welcome-mark" aria-hidden="true">+</div><p class="kicker">Chicken safety roleplay</p><h1 id="welcome-title">STAY SAFE</h1><p>For people who want to feel safer and more prepared. Practice calm, practical choices for getting away, getting hidden, and getting help during a threat involving an armed person.</p><button class="primary welcome-button" id="continue" type="button">Continue <span>→</span></button></section>
+    <div id="app-content" class="hidden">
+      <header><a class="brand" href="#top"><b>+</b><span><strong>Stay Ready</strong><small>Chicken safety roleplay</small></span></a><span id="progress">Scenario 1 of 4</span><button id="reset" class="link-btn">Reset</button></header>
+      <main id="top">
+      <section class="intro"><div><p class="kicker">Calm practice</p><h1>Know your next safe step.</h1><p>Violence involving guns can be frightening and unpredictable. Preparing ahead can help you recognize safer options: move away when a route is safe, get out of sight when it is not, and contact emergency responders when you can.</p><button id="start" class="primary">Begin practice <span>→</span></button></div><aside><b>Real emergency?</b><h2>Call local emergency services first.</h2><p>This app is for preparation, not live guidance. Follow emergency responder instructions and only act when you can do so safely.</p></aside></section>
+      <section class="share-app" aria-labelledby="share-title"><div><p class="kicker">Share Stay Ready</p><h2 id="share-title">Bring practice with you.</h2><p>Scan this code to open Stay Ready on another device.</p><a id="share-link" href="#" target="_blank" rel="noopener">Open the app link</a></div><img id="share-qr" class="share-qr" alt="QR code to open Stay Ready" /></section>
+      <section class="principles"><p class="kicker">Remember</p><h2>Get away. Get hidden. Get help.</h2><div class="principle-grid"><article><b>01</b><h3>Get away</h3><p>Move away from danger if you can do so safely.</p></article><article><b>02</b><h3>Get hidden</h3><p>If leaving is unsafe, secure yourself out of view.</p></article><article><b>03</b><h3>Get help</h3><p>When safe, contact responders and share your location.</p></article></div></section>
+      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Live practice</p><h2 id="questionTitle">Choose what you would do</h2><p class="game-instruction">Read the scenario and pick the safest choice. You have three options—one is the best decision to keep you safe.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div id="scene"></div><div><p class="choice-label">Your next move</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Continue scenario →</button></section>
+      <section class="special-game-unlock hidden" id="special-game-unlock"><p class="kicker">Achievement Unlocked!</p><h2>20 Correct Answers Reached! 🎉</h2><p>Great job demonstrating safety awareness across 20 scenarios. Click below to enter the game!</p><button id="launch-special-game" class="primary">Launch Special Game 🎮</button></section>
+      <section class="special-game hidden" id="special-game">
+        <div class="special-game-heading">
+          <div>
+            <p class="kicker">3D School Alarm Survival</p>
+            <h2>Hide & Survive Lockdown</h2>
+            <p>An alarm breaks out at school! Choose a 3D hiding spot, lock the door, silence your phone, and stay out of sight before the searcher sweeps the area.</p>
+          </div>
+          <div class="sg-status-pills">
+            <span id="sg-level-badge">Area 1: Science Classroom</span>
+            <span id="sg-timer-badge">Alarm: Ready</span>
+          </div>
+        </div>
+        <div class="sg-game-wrapper">
+          <div class="sg-3d-room" id="sg-3d-room" tabindex="0">
+            <div class="sg-alarm-overlay" id="sg-alarm-overlay"></div>
+            <div class="sg-search-beam" id="sg-search-beam"></div>
+            <div class="sg-key-hints"><span class="key-badge">WASD</span> Walk | <span class="key-badge">E</span> Hide / Interact | <span class="key-badge">C</span> Crouch under tables</div>
+            <div class="sg-interact-prompt hidden" id="sg-interact-prompt">Press <span class="key-badge">E</span> to Hide</div>
+            <div class="sg-room-ceiling">
+              <div class="sg-light"></div>
+            </div>
+            <div class="sg-room-backwall">
+              <div class="sg-blackboard"><span>SCIENCE CLASSROOM</span></div>
+              <div class="sg-door-obj" id="sg-door-obj"><span>DOOR</span><b id="sg-door-lock-status">UNLOCKED</b></div>
+              <div class="sg-window-obj" id="sg-window-obj"><span>WINDOW</span></div>
+            </div>
+            <div class="sg-room-floor" id="sg-room-floor">
+              <div class="sg-closet-obj" id="sg-closet-obj"><span>SUPPLY CLOSET</span></div>
+              <div class="sg-desk-obj" id="sg-desk-obj"><span>TEACHER DESK</span></div>
+              <div class="sg-student-desk" id="sg-student-desk"><span>STUDENT TABLES</span></div>
+              <div class="sg-bookshelf-obj" id="sg-bookshelf-obj"><span>BOOKSHELF</span></div>
+              <div class="sg-player-avatar" id="sg-player-avatar"><i></i><b></b><span class="avatar-label">YOU</span></div>
+            </div>
+            <div class="sg-dpad">
+              <button class="dpad-btn" id="dpad-up" title="Move Up (W / ⬆️)">▲</button>
+              <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-left" title="Move Left (A / ⬅️)">◀</button>
+                <button class="dpad-btn" id="dpad-down" title="Move Down (S / ⬇️)">▼</button>
+                <button class="dpad-btn" id="dpad-right" title="Move Right (D / ➡️)">▶</button>
+              </div>
+            </div>
+            <div class="sg-room-caption" id="sg-room-caption">Classroom Alarm! Use WASD to walk, E to hide in closet, C to crouch under tables.</div>
+          </div>
+          <div class="sg-controls-panel">
+            <div class="sg-control-section">
+              <p class="choice-label">1. Choose 3D Hiding Spot</p>
+              <div class="sg-spots-grid">
+                <button class="sg-btn-spot" data-sgspot="closet">🚪 Supply Closet <small>(High Cover)</small></button>
+                <button class="sg-btn-spot" data-sgspot="desk">🪑 Heavy Desk <small>(Medium Cover)</small></button>
+                <button class="sg-btn-spot" data-sgspot="bookshelf">📚 Bookshelf <small>(High Cover)</small></button>
+                <button class="sg-btn-spot" data-sgspot="window">🪟 By Window <small>(Exposed!)</small></button>
+              </div>
+            </div>
+            <div class="sg-control-section">
+              <p class="choice-label">2. Critical Safety Actions</p>
+              <div class="sg-actions-grid">
+                <button class="sg-btn-act" id="sg-act-door">🔒 Door: <b>UNLOCKED</b></button>
+                <button class="sg-act-btn" id="sg-act-phone">📱 Phone: <b>RINGER ON</b></button>
+                <button class="sg-act-btn" id="sg-act-posture">🧎 Position: <b>STANDING</b></button>
+              </div>
+            </div>
+            <div class="sg-status-area">
+              <p id="sg-feedback-msg" aria-live="polite">Click "Start Lockdown" when you are ready to test your hiding strategy.</p>
+              <div class="sg-btn-row">
+                <button id="sg-start-timer-btn" class="primary">Start Lockdown 🚨</button>
+                <button id="sg-retry-btn" class="outline hidden">Retry Level 🔄</button>
+                <button id="sg-next-level-btn" class="primary hidden">Next Area →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="drill hidden" id="drill"><div class="drill-heading"><div><p class="kicker">Unlocked at 3 correct answers</p><h2>Field drill: find safe cover.</h2><p>You are the bald character at the start point. Choose a place to hide and read the safety result.</p></div><span>3D drill</span></div><div class="drill-grid"><div class="room" aria-label="3D room with hiding places"><div class="ceiling"></div><div class="exit">EXIT</div><button class="spot window" data-spot="window">WINDOW</button><button class="spot desk" data-spot="desk">HEAVY DESK</button><button class="spot safe-room" data-spot="room">LOCKED ROOM</button><div class="avatar" aria-label="Bald player character"><i></i><b></b></div><p id="room-caption">A safety alert sounds. Choose a hiding place that keeps you out of sight.</p></div><div><p class="choice-label">Choose a hiding place</p><button class="drill-choice" data-spot="window"><b>Hide by the window</b><small>Visible from outside.</small></button><button class="drill-choice" data-spot="desk"><b>Hide behind the heavy desk</b><small>Low cover, but the room is open.</small></button><button class="drill-choice" data-spot="room"><b>Move into the locked room</b><small>Out of view with a door to secure.</small></button><p id="drill-feedback" aria-live="polite">Choose a spot to see the result.</p><button id="replay" class="outline hidden">Replay drill</button></div></div></section>
+      <section class="alert"><div><p class="kicker">Your safety circle</p><h2>Practice an alert you can send when safe.</h2><p>Do not stop or expose yourself to send a message. Contact responders first during immediate danger.</p></div><form id="alert-form"><label for="contact">Trusted contact</label><input id="contact" placeholder="e.g. Sam" /><label for="where">Where are you?</label><input id="where" placeholder="e.g. north library entrance" /><button class="outline" type="submit">Preview alert →</button><small id="preview">Nothing will be sent from this practice app.</small></form></section>
+      </main>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
