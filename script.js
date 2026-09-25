@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const shareUrl = window.location.href;
+  const shareUrl = 'https://ailogicking.github.io/Stay-Safe-Roleplay/';
   const shareLink = document.getElementById('share-link');
   const shareQr = document.getElementById('share-qr');
 
