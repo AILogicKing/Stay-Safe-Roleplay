@@ -29,34 +29,33 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   function generateScenarios() {
-    const scenarios = [];
-    const usedCombinations = new Set();
-    
-    for (let i = 0; i < 10000; i++) {
-      let location, type, container, safeInfo;
-      let combination;
-      
-      do {
-        location = locations[Math.floor(Math.random() * locations.length)];
-        type = scenarioTypes[Math.floor(Math.random() * scenarioTypes.length)];
-        container = containerTypes[Math.floor(Math.random() * containerTypes.length)];
-        safeInfo = safeResponses[Math.floor(Math.random() * safeResponses.length)];
-        combination = `${location}-${type}-${container}-${safeInfo.action}`;
-      } while (usedCombinations.has(combination) && scenarios.length < 10000);
-      
-      usedCombinations.add(combination);
-      
+    const combinations = [];
+
+    locations.forEach((location) => {
+      scenarioTypes.forEach((type) => {
+        containerTypes.forEach((container) => {
+          safeResponses.forEach((safeInfo) => {
+            combinations.push({ location, type, container, safeInfo });
+          });
+        });
+      });
+    });
+
+    for (let i = combinations.length - 1; i > 0; i -= 1) {
+      const swapIndex = Math.floor(Math.random() * (i + 1));
+      [combinations[i], combinations[swapIndex]] = [combinations[swapIndex], combinations[i]];
+    }
+
+    return combinations.slice(0, 10000).map(({ location, type, container, safeInfo }) => {
       const sceneHtml = `<em>At ${location}</em><p>You experience ${type}. You are in ${container}.</p><strong>What should you do?</strong>`;
       const choices = [
         [safeInfo.action, true, 'Good choice. This keeps you safe. Move away from danger and follow responder instructions.'],
         [safeInfo.wrong[0], false, 'This action increases risk. Prioritize getting to a safe location.'],
         [safeInfo.wrong[1], false, 'This approach does not prioritize your safety. Move away from danger when possible.']
       ];
-      
-      scenarios.push({ scene: sceneHtml, choices: choices });
-    }
-    
-    return scenarios;
+
+      return { scene: sceneHtml, choices: choices };
+    });
   }
 
   const scenarios = generateScenarios();
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-spot]').forEach((element) => element.addEventListener('click', () => hide(element.dataset.spot)));
   $('next').addEventListener('click', () => { if (index < scenarios.length - 1) { index += 1; render(); $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
   $('start').addEventListener('click', () => $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }));
-  $('reset').addEventListener('click', () => { index = 0; score = 0; $('drill').classList.add('hidden'); $('special-game-unlock').classList.add('hidden'); $('special-game').classList.add('hidden'); render(); window.scrollTo(0, 0); });
+  $('reset').addEventListener('click', () => { index = 0; score = 0; $('drill').classList.add('hidden'); initSpecialGame(); render(); window.scrollTo(0, 0); });
   $('launch-special-game').addEventListener('click', () => { $('special-game').classList.remove('hidden'); $('special-game').scrollIntoView({ behavior: 'smooth', block: 'start' }); initSpecialGame(); });
 
   // 3D School Alarm Lockdown Game Logic
@@ -93,11 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getSpotCoords() {
     const fw = getFloorWidth();
+    const layout = roomLayouts[sgLevel] || roomLayouts[1];
     return {
-      closet: { x: 45, y: 20 },
-      desk: { x: 160, y: 40 },
-      bookshelf: { x: Math.max(280, fw - 65), y: 20 },
-      window: { x: Math.floor(fw / 2 + 20), y: -50 }
+      closet: { x: layout.spots.closet.x || fw - 75, y: layout.spots.closet.y },
+      desk: layout.spots.desk,
+      bookshelf: { x: layout.spots.bookshelf.x || fw - 65, y: layout.spots.bookshelf.y },
+      window: { x: layout.spots.window.x || Math.floor(fw / 2 + 20), y: -50 },
+      door: { x: layout.spots.door.x || Math.floor(fw / 2 - 25), y: -25 }
     };
   }
 
@@ -107,8 +108,106 @@ document.addEventListener('DOMContentLoaded', () => {
     3: 'Area 3: School Library'
   };
 
+  const seedRoomLayouts = {
+    1: {
+      labels: ['SCIENCE CLASSROOM', 'SUPPLY CLOSET', 'TEACHER DESK', 'STUDENT TABLES', 'LAB STORAGE', 'WINDOW'],
+      spots: { closet: { x: 45, y: 20 }, desk: { x: 160, y: 40 }, bookshelf: { x: 0, y: 20 }, window: { x: 0 }, door: { x: 45 } },
+      furniture: { closet: ['15px', '', '10px'], desk: ['110px', '', '15px'], tables: ['110px', '', '70px'], bookshelf: ['', '15px', '10px'], window: ['50%', '', '15px'], door: ['25%', '', ''] }
+    },
+    2: {
+      labels: ['MAIN CORRIDOR', 'SECURITY OFFICE', 'RECEPTION DESK', 'WAITING BENCHES', 'LOCKERS', 'GLASS EXIT'],
+      spots: { closet: { x: 0, y: 22 }, desk: { x: 240, y: 38 }, bookshelf: { x: 45, y: 25 }, window: { x: 0 }, door: { x: 0 } },
+      furniture: { closet: ['', '15px', '10px'], desk: ['220px', '', '18px'], tables: ['90px', '', '76px'], bookshelf: ['15px', '', '10px'], window: ['', '20px', '18px'], door: ['50%', '', ''] }
+    },
+    3: {
+      labels: ['SCHOOL LIBRARY', 'ARCHIVE ROOM', 'LIBRARIAN DESK', 'READING TABLES', 'BOOKSHELVES', 'LIBRARY WINDOW'],
+      spots: { closet: { x: 250, y: 22 }, desk: { x: 95, y: 35 }, bookshelf: { x: 0, y: 15 }, window: { x: 0 }, door: { x: 0 } },
+      furniture: { closet: ['245px', '', '10px'], desk: ['45px', '', '18px'], tables: ['125px', '', '75px'], bookshelf: ['', '15px', '10px'], window: ['20px', '', '18px'], door: ['', '18%', ''] }
+    }
+  };
+
+  const ROOM_COUNT = 120;
+  const roomThemes = [
+    ['SCIENCE CLASSROOM', 'SUPPLY CLOSET', 'TEACHER DESK', 'STUDENT TABLES', 'LAB STORAGE', 'WINDOW', '#234f5b', '#2b625f'],
+    ['MAIN CORRIDOR', 'SECURITY OFFICE', 'RECEPTION DESK', 'WAITING BENCHES', 'LOCKERS', 'GLASS EXIT', '#29445f', '#41627c'],
+    ['SCHOOL LIBRARY', 'ARCHIVE ROOM', 'LIBRARIAN DESK', 'READING TABLES', 'BOOKSHELVES', 'LIBRARY WINDOW', '#3c345b', '#5c507a'],
+    ['ART STUDIO', 'SUPPLY ROOM', 'WORK TABLE', 'PROJECT TABLES', 'CANVAS RACK', 'NORTH WINDOW', '#5a3f38', '#765548'],
+    ['CAFETERIA', 'STAFF ROOM', 'SERVICE COUNTER', 'LUNCH TABLES', 'FOOD STORAGE', 'DELIVERY DOOR', '#4b5538', '#66724b'],
+    ['MUSIC ROOM', 'EQUIPMENT ROOM', 'CONDUCTOR DESK', 'PRACTICE SEATS', 'INSTRUMENT RACK', 'SIDE WINDOW', '#304f50', '#42706a']
+  ];
+  const roomArrangements = [
+    { closet: [45, 20], desk: [160, 40], bookshelf: [0, 20], window: [0, -50], door: [45, -25], furniture: [['15px', '', '10px'], ['110px', '', '15px'], ['110px', '', '70px'], ['', '15px', '10px'], ['50%', '', '15px'], ['25%', '', '']] },
+    { closet: [0, 22], desk: [240, 38], bookshelf: [45, 25], window: [0, -50], door: [0, -25], furniture: [['', '15px', '10px'], ['220px', '', '18px'], ['90px', '', '76px'], ['15px', '', '10px'], ['', '20px', '18px'], ['50%', '', '']] },
+    { closet: [250, 22], desk: [95, 35], bookshelf: [0, 15], window: [0, -50], door: [0, -25], furniture: [['245px', '', '10px'], ['45px', '', '18px'], ['125px', '', '75px'], ['', '15px', '10px'], ['20px', '', '18px'], ['', '18%', '']] },
+    { closet: [125, 20], desk: [275, 35], bookshelf: [45, 20], window: [0, -50], door: [0, -25], furniture: [['120px', '', '10px'], ['260px', '', '18px'], ['70px', '', '75px'], ['45px', '', '10px'], ['50%', '', '18px'], ['72%', '', '']] },
+    { closet: [300, 22], desk: [65, 40], bookshelf: [170, 20], window: [0, -50], door: [0, -25], furniture: [['295px', '', '10px'], ['35px', '', '18px'], ['90px', '', '72px'], ['165px', '', '10px'], ['', '22px', '18px'], ['18%', '', '']] }
+  ];
+  const roomLayouts = { ...seedRoomLayouts };
+
+  for (let design = 4; design <= ROOM_COUNT; design += 1) {
+    const theme = roomThemes[(design - 1) % roomThemes.length];
+    const arrangement = roomArrangements[(design - 1) % roomArrangements.length];
+    const variation = Math.floor((design - 1) / roomArrangements.length);
+    const offset = (variation % 3) * 18;
+    roomLayouts[design] = {
+      labels: theme.slice(0, 6).map((label, index) => `${label} ${variation + 1}`),
+      spots: {
+        closet: { x: arrangement.closet[0] + offset, y: arrangement.closet[1] },
+        desk: { x: arrangement.desk[0] + offset, y: arrangement.desk[1] },
+        bookshelf: { x: arrangement.bookshelf[0] + offset, y: arrangement.bookshelf[1] },
+        window: { x: arrangement.window[0] + offset },
+        door: { x: arrangement.door[0] + offset }
+      },
+      furniture: {
+        closet: arrangement.furniture[0],
+        desk: arrangement.furniture[1],
+        tables: arrangement.furniture[2],
+        bookshelf: arrangement.furniture[3],
+        window: arrangement.furniture[4],
+        door: arrangement.furniture[5]
+      },
+      colors: { backwall: theme[6], floor: theme[7] }
+    };
+  }
+
+  function applyRoomLayout() {
+    const layout = roomLayouts[sgLevel] || roomLayouts[1];
+    const objects = [
+      ['sg-closet-obj', layout.furniture.closet, layout.labels[1]],
+      ['sg-desk-obj', layout.furniture.desk, layout.labels[2]],
+      ['sg-student-desk', layout.furniture.tables, layout.labels[3]],
+      ['sg-bookshelf-obj', layout.furniture.bookshelf, layout.labels[4]],
+      ['sg-window-obj', layout.furniture.window, layout.labels[5]],
+      ['sg-door-obj', layout.furniture.door, 'DOOR']
+    ];
+
+    $('sg-blackboard').querySelector('span').textContent = layout.labels[0];
+    if (layout.colors) {
+      $('sg-room-backwall').style.background = layout.colors.backwall;
+      $('sg-room-floor').style.background = `linear-gradient(${layout.colors.floor}, #172925)`;
+    }
+    objects.forEach(([id, position, label]) => {
+      const element = $(id);
+      if (!element) return;
+      element.style.left = position[0];
+      element.style.right = position[1];
+      element.style.top = position[2];
+      if (element.querySelector('span')) element.querySelector('span').textContent = label;
+    });
+
+    const buttonLabels = { closet: layout.labels[1], desk: layout.labels[2], bookshelf: layout.labels[4], window: layout.labels[5] };
+    document.querySelectorAll('.sg-btn-spot').forEach((button) => {
+      const label = buttonLabels[button.dataset.sgspot];
+      const small = button.querySelector('small');
+      const labelNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+      if (label && labelNode) labelNode.textContent = ` ${label} `;
+      if (small && button.dataset.sgspot === 'window') small.textContent = '(Exposed)';
+    });
+  }
+
   function initSpecialGame() {
     sgSpot = 'closet';
+    isInsideCloset = false;
     const coords = getSpotCoords();
     charX = coords.closet.x;
     charY = coords.closet.y;
@@ -124,28 +223,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function detectSpotFromPosition() {
     const fw = getFloorWidth();
+    const coords = getSpotCoords();
+    const near = (spot, radiusX = 65, radiusY = 55) => Math.abs(charX - coords[spot].x) <= radiusX && Math.abs(charY - coords[spot].y) <= radiusY;
     const prompt = $('sg-interact-prompt');
     let promptHtml = '';
 
-    if (isInsideCloset || (charX <= 90 && charY <= 50)) {
+    if (isInsideCloset || near('closet')) {
       sgSpot = 'closet';
-      if (!sgRunning) $('sg-room-caption').textContent = '🚪 In Supply Closet! (High Cover - Hidden from view)';
+      if (!sgRunning) $('sg-room-caption').textContent = '🚪 In the room\'s secure cover area. (High cover - hidden from view)';
       promptHtml = isInsideCloset ? 'Press <span class="key-badge">E</span> to Step Out of Closet' : 'Press <span class="key-badge">E</span> to Hide in Closet';
-    } else if (charY <= -15 && charX >= 20 && charX <= 120) {
+    } else if (near('door', 55, 35)) {
       sgSpot = 'door';
-      if (!sgRunning) $('sg-room-caption').textContent = `🔒 Classroom Door (${sgDoorLocked ? 'LOCKED' : 'UNLOCKED'})`;
+      if (!sgRunning) $('sg-room-caption').textContent = `🔒 Door (${sgDoorLocked ? 'LOCKED' : 'UNLOCKED'})`;
       promptHtml = `Press <span class="key-badge">E</span> to ${sgDoorLocked ? 'Unlock' : 'Lock'} Door`;
-    } else if (charX >= 100 && charX <= 220 && charY >= 10 && charY <= 90) {
+    } else if (near('desk')) {
       sgSpot = 'desk';
-      if (!sgRunning) $('sg-room-caption').textContent = sgCrouched ? '🧎 Crouched under Classroom Tables & Desks! (Medium Cover)' : '🪑 By Classroom Tables & Desks. Press C to crouch under!';
+      if (!sgRunning) $('sg-room-caption').textContent = sgCrouched ? '🧎 Crouched under nearby furniture. (Medium cover)' : '🪑 Near furniture. Press C to crouch under it.';
       promptHtml = `Press <span class="key-badge">C</span> to ${sgCrouched ? 'Stand Up' : 'Crouch Under Tables'}`;
-    } else if (charX >= Math.max(220, fw - 130) && charY <= 60) {
+    } else if (near('bookshelf')) {
       sgSpot = 'bookshelf';
-      if (!sgRunning) $('sg-room-caption').textContent = '📚 Behind Bookshelf! (High Cover)';
+      if (!sgRunning) $('sg-room-caption').textContent = '📚 Behind high cover. (Hidden from view)';
       promptHtml = 'Press <span class="key-badge">E</span> to Hide behind Bookshelf';
-    } else if (charY <= -15 && charX >= fw / 2 - 40 && charX <= fw / 2 + 80) {
+    } else if (near('window', 70, 35)) {
       sgSpot = 'window';
-      if (!sgRunning) $('sg-room-caption').textContent = '🪟 Near Window! (Exposed from outside!)';
+      if (!sgRunning) $('sg-room-caption').textContent = '🪟 Near an opening. (Exposed from outside)';
       promptHtml = '⚠️ Move away from the window!';
     } else {
       sgSpot = 'open';
@@ -174,7 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateSpecialGameUI() {
-    $('sg-level-badge').textContent = levelNames[sgLevel] || 'Area 1: Science Classroom';
+    applyRoomLayout();
+    const layout = roomLayouts[sgLevel] || roomLayouts[1];
+    $('sg-level-badge').textContent = `${layout.labels[0]} · Design ${sgLevel} of ${ROOM_COUNT}`;
     $('sg-timer-badge').textContent = sgRunning ? `Alarm: ${sgTimerCount}s` : 'Alarm: Ready';
     
     detectSpotFromPosition();
@@ -420,17 +523,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (score >= 75) {
-        if (sgLevel < 3) {
-          $('sg-feedback-msg').innerHTML = `<b>✅ SAFE! You survived the sweep in ${levelNames[sgLevel]}!</b><br>Great decisions: door locked, phone silenced, and well hidden.`;
+        if (sgLevel < ROOM_COUNT) {
+          $('sg-feedback-msg').innerHTML = `<b>Safe choice in ${levelNames[sgLevel]}.</b><br>You secured the door, silenced your phone, and stayed out of view. Continue following responder instructions.`;
           $('sg-next-level-btn').classList.remove('hidden');
         } else {
-          $('sg-feedback-msg').innerHTML = `<b>🎉 CHAMPION! You cleared all 3 School Lockdown areas!</b><br>You mastered getting away, getting hidden, and staying safe under pressure!`;
-          $('sg-retry-btn').textContent = 'Play Again 🔄';
+          $('sg-feedback-msg').innerHTML = `<b>Practice complete.</b><br>You rehearsed getting away, getting hidden, and staying out of view across all three areas.`;
+          $('sg-retry-btn').textContent = 'Repeat drill';
           $('sg-retry-btn').classList.remove('hidden');
         }
       } else {
-        $('sg-feedback-msg').innerHTML = `<b>❌ CAUGHT! You were spotted.</b><br>${failureReasons.join('. ')}.`;
-        $('sg-retry-btn').textContent = 'Retry Level 🔄';
+        $('sg-feedback-msg').innerHTML = `<b>Review your safety choices.</b><br>${failureReasons.join('. ')}. Try the drill again and prioritize cover, silence, and a secured door.`;
+        $('sg-retry-btn').textContent = 'Repeat level';
         $('sg-retry-btn').classList.remove('hidden');
       }
 
@@ -440,11 +543,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if ($('sg-retry-btn')) {
     $('sg-retry-btn').addEventListener('click', () => {
-      if (sgLevel > 3) sgLevel = 1;
+      if (sgLevel > ROOM_COUNT) sgLevel = 1;
       initSpecialGame();
       $('sg-start-timer-btn').classList.remove('hidden');
       $('sg-retry-btn').classList.add('hidden');
-      $('sg-feedback-msg').textContent = 'Click "Start Lockdown" when you are ready to test your hiding strategy.';
+      $('sg-feedback-msg').textContent = 'Configure the room, then start the drill. This is practice, not live emergency guidance.';
     });
   }
 
@@ -454,10 +557,11 @@ document.addEventListener('DOMContentLoaded', () => {
       initSpecialGame();
       $('sg-start-timer-btn').classList.remove('hidden');
       $('sg-next-level-btn').classList.add('hidden');
-      $('sg-feedback-msg').textContent = `Welcome to ${levelNames[sgLevel]}! Configure your 3D hiding spot and safety actions.`;
+      $('sg-feedback-msg').textContent = `Welcome to ${roomLayouts[sgLevel].labels[0]}. Configure your hiding spot and safety actions, then start the practice sweep.`;
     });
   }
   $('replay').addEventListener('click', () => { document.querySelectorAll('[data-spot]').forEach((el) => el.classList.remove('selected')); $('room-caption').textContent = 'A safety alert sounds. Choose a hiding place that keeps you out of sight.'; $('drill-feedback').textContent = 'Choose a spot to see the result.'; $('drill-feedback').className = ''; $('replay').classList.add('hidden'); });
   $('alert-form').addEventListener('submit', (event) => { event.preventDefault(); const contact = $('contact').value.trim() || 'your trusted contact'; const where = $('where').value.trim() || 'my current location'; $('preview').textContent = `Preview: “Hi ${contact}, I am safe at ${where}. I am following responder instructions.”`; });
+  initSpecialGame();
   render();
 });
