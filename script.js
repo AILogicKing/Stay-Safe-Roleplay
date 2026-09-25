@@ -181,10 +181,12 @@ document.addEventListener('DOMContentLoaded', () => {
       ['sg-door-obj', layout.furniture.door, 'DOOR']
     ];
 
-    $('sg-blackboard').querySelector('span').textContent = layout.labels[0];
+    const blackboard = $('sg-blackboard');
+    if (!blackboard) return;
+    blackboard.querySelector('span').textContent = layout.labels[0];
     if (layout.colors) {
-      $('sg-room-backwall').style.background = layout.colors.backwall;
-      $('sg-room-floor').style.background = `linear-gradient(${layout.colors.floor}, #172925)`;
+      if ($('sg-room-backwall')) $('sg-room-backwall').style.background = layout.colors.backwall;
+      if ($('sg-room-floor')) $('sg-room-floor').style.background = `linear-gradient(${layout.colors.floor}, #172925)`;
     }
     objects.forEach(([id, position, label]) => {
       const element = $(id);
