@@ -1,4 +1,4 @@
-# Stay Ready | Safety Roleplay
+# Stay Safe Steady Roleplay
 
 A safety roleplay app for people who want to feel safer and more prepared.
 
