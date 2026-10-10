@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D Classroom Challenge | Stay Safe Steady</title>
+  <style>
+    :root {
+      --ink: #19334e;
+      --muted: #526b7f;
+      --line: #d9e9f4;
+      --blue: #087fae;
+      --navy: #17355b;
+      --orange: #ed5b31;
+      --yellow: #ffe04b;
+      --cyan: #35c8d0;
+      color-scheme: light;
+      font-family: "DM Sans", "Trebuchet MS", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      background-color: #f28a24;
+      background-image: radial-gradient(circle, rgba(255, 213, 113, .72) 2px, transparent 2.5px);
+      background-size: 28px 28px;
+      color: var(--ink);
+      margin: 0;
+      min-width: 320px;
+    }
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+    .game-page { margin: auto; max-width: 1480px; padding: 22px clamp(16px, 3vw, 40px) 40px; }
+    .game-header { align-items: center; display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .game-header a { color: var(--navy); font-weight: 800; }
+    .game-header span { color: var(--navy); font-size: .78rem; font-weight: 800; text-transform: uppercase; }
+    .game-heading { align-items: end; display: flex; flex-wrap: wrap; gap: 10px 30px; justify-content: space-between; margin-bottom: 20px; }
+    .game-heading h1 { font-size: clamp(2rem, 4vw, 3.4rem); margin: 0 0 8px; }
+    .game-heading p { color: var(--muted); line-height: 1.5; margin: 0; max-width: 720px; }
+    .barrier-practice { background: #fff078; border: 3px solid var(--orange); border-radius: 14px; padding: clamp(16px, 2vw, 26px); }
+    .barrier-layout { display: grid; gap: 18px; grid-template-columns: minmax(0, 1.6fr) minmax(270px, .65fr); }
+    .barrier-canvas-shell { background: var(--navy); border: 3px solid var(--navy); border-radius: 12px; height: clamp(360px, 38vw, 520px); overflow: hidden; }
+    #barrier-canvas { display: block; height: 100%; touch-action: none; width: 100%; }
+    .barrier-controls { align-content: start; background: #e7f2fc; border: 2px solid var(--cyan); border-radius: 10px; display: grid; gap: 14px; padding: 18px; }
+    .barrier-controls p { line-height: 1.45; margin: 0; }
+    #barrier-countdown { color: var(--orange); font-size: 1.45rem; font-weight: 900; }
+    #barrier-status { color: var(--navy); font-weight: 800; min-height: 4em; }
+    .avatar-controls { display: grid; gap: 5px; grid-template-columns: repeat(3, 48px); justify-content: center; }
+    .avatar-controls button { background: var(--blue); border: 0; border-radius: 8px; color: white; font-size: 1.15rem; height: 44px; touch-action: manipulation; }
+    .barrier-actions { align-self: end; display: flex; flex-wrap: wrap; gap: 10px; }
+    .barrier-actions button { border: 0; border-radius: 10px; font-weight: 800; padding: 12px 16px; }
+    #barrier-start-timer, #barrier-test { background: var(--blue); box-shadow: 0 4px 0 #07547b; color: white; }
+    #barrier-reset { background: white; border: 2px solid var(--blue); color: var(--blue); }
+    .barrier-actions button:disabled, #avatar-hide:disabled { cursor: not-allowed; opacity: .55; }
+    #avatar-hide { background: transparent; border: 2px solid var(--blue); border-radius: 9px; color: var(--blue); font-weight: 800; padding: 11px; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+    @media (max-width: 760px) {
+      .game-page { padding: 14px 14px 28px; }
+      .barrier-layout { grid-template-columns: 1fr; }
+      .barrier-canvas-shell { height: min(52vh, 420px); min-height: 280px; }
+      .barrier-controls { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGCJDKYW9X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SGCJDKYW9X');
+  </script>
+</head>
+<body>
+  <div class="game-page">
+    <header class="game-header">
+      <a href="index.html">← Back to practice</a>
+      <span>Stay Safe Steady</span>
+    </header>
+    <main>
+      <div class="game-heading">
+        <div>
+          <h1>3D classroom challenge</h1>
+          <p>When you are ready, start the timer. You have 20 seconds to hide your avatar and move two randomly selected furniture pieces across the doorway.</p>
+        </div>
+      </div>
+      <section class="barrier-practice" id="barrier-practice" aria-labelledby="barrier-title">
+        <h2 id="barrier-title" hidden>Hide and build a door barrier</h2>
+        <div class="barrier-layout">
+          <div class="barrier-canvas-shell">
+            <canvas id="barrier-canvas" aria-label="Three-dimensional classroom. Move your avatar to the blue hiding spot and drag the random furniture pieces to the doorway markers."></canvas>
+          </div>
+          <div class="barrier-controls">
+            <p id="barrier-countdown" aria-live="off">Ready when you are</p>
+            <p>Move with WASD, arrow keys, or the buttons. Hide at the blue spot and drag both furniture pieces to the doorway, or walk out the door to the main corridor.</p>
+            <div class="avatar-controls" aria-label="Move your avatar">
+              <span></span><button type="button" data-avatar-move="0,-1" aria-label="Move up">▲</button><span></span>
+              <button type="button" data-avatar-move="-1,0" aria-label="Move left">◀</button><button type="button" data-avatar-move="0,1" aria-label="Move down">▼</button><button type="button" data-avatar-move="1,0" aria-label="Move right">▶</button>
+            </div>
+            <button id="avatar-hide" type="button" disabled>Hide here (E)</button>
+            <p id="barrier-status" role="status" aria-live="polite">3D classroom loading...</p>
+            <div class="barrier-actions">
+              <button id="barrier-start-timer" type="button">Start timer</button>
+              <button id="barrier-test" type="button" disabled>Test barrier</button>
+              <button id="barrier-reset" type="button">Reset furniture</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="barrier-game.js"></script>
+</body>
+</html>

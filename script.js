@@ -16,16 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const scenarioTypes = ['loud noise', 'running people', 'unusual commotion', 'shouting', 'blocked exit', 'unfamiliar person', 'sounds of danger', 'alarm activation', 'emergency vehicle sounds', 'yelling'];
   const containerTypes = ['a room with a lock', 'a building with exits', 'an outdoor area', 'a vehicle', 'a large room', 'a small space', 'a multi-level building', 'an open floor plan', 'a confined space', 'a space with furniture'];
   const safeResponses = [
-    { action: 'Move away from the sound to a known exit', wrong: ['Move toward the sound', 'Stay where you are and wait'] },
-    { action: 'Lock or block the door, silence devices, and stay out of view', wrong: ['Open the door to investigate', 'Stand near the window'] },
-    { action: 'Give your location to responders and follow their instructions', wrong: ['Post on social media first', 'Leave your location and move around'] },
-    { action: 'Tell your trusted contact you are safe and following responders', wrong: ['Go back to find others', 'Share unconfirmed rumors'] },
-    { action: 'Get to an external location away from the building', wrong: ['Hide in the building', 'Wait indoors for someone to come to you'] },
-    { action: 'Stay quiet and out of sight until responders clear the area', wrong: ['Make noise to signal for help', 'Look around to see what is happening'] },
-    { action: 'Follow evacuation routes if they are clearly safe', wrong: ['Use any route you can find', 'Wait for someone to guide you'] },
-    { action: 'Keep your phone silent and available if safe to do so', wrong: ['Call multiple people to ask what to do', 'Record video of the situation'] },
-    { action: 'Stay calm and help others around you move to safety if possible', wrong: ['Panic and run without direction', 'Focus only on yourself and ignore others'] },
-    { action: 'Trust responder instructions over rumors from others', wrong: ['Follow what other people are doing', 'Wait for social media updates'] }
+    { action: 'Move to a safe exit', why: 'A clear, safe exit creates distance from danger.', wrong: ['Move toward the sound', 'Stay and wait'] },
+    { action: 'Secure the door, silence your phone, and hide', why: 'If leaving is unsafe, a secured door, quiet phone, and hidden spot can lower risk.', wrong: ['Open the door to look', 'Stand by the window'] },
+    { action: 'Share your location with responders', why: 'Responders need your location to find and help you.', wrong: ['Post online first', 'Walk around while reporting'] },
+    { action: 'Message your contact when safe', why: 'Wait until it is safe to message, so you do not expose or distract yourself.', wrong: ['Go back for others', 'Share unconfirmed rumors'] },
+    { action: 'Leave if the route is safe', why: 'A safe route helps you get farther from danger.', wrong: ['Hide inside', 'Wait for someone to come'] },
+    { action: 'Stay hidden and quiet', why: 'Staying out of sight and quiet can help keep you safer until responders clear the area.', wrong: ['Make noise to signal', 'Look around to investigate'] },
+    { action: 'Use a safe exit route', why: 'A route you know is clear helps you avoid moving toward danger.', wrong: ['Take any route', 'Wait for someone to lead'] },
+    { action: 'Silence your phone', why: 'A quiet phone draws less attention; keep it available for responders if safe.', wrong: ['Call everyone for advice', 'Record what’s happening'] },
+    { action: 'Stay calm; help others if safe', why: 'A calm plan helps, and helping is right only when it is safe for you too.', wrong: ['Run without a plan', 'Ignore people nearby'] },
+    { action: 'Follow responders, not rumors', why: 'Responders have verified information; rumors can lead you the wrong way.', wrong: ['Follow the crowd', 'Wait for social posts'] }
   ];
 
   function generateScenarios() {
@@ -46,31 +46,38 @@ document.addEventListener('DOMContentLoaded', () => {
       [combinations[i], combinations[swapIndex]] = [combinations[swapIndex], combinations[i]];
     }
 
-    return combinations.slice(0, 10000).map(({ location, type, container, safeInfo }) => {
-      const sceneHtml = `<em>At ${location}</em><p>You experience ${type}. You are in ${container}.</p><strong>What should you do?</strong>`;
+    const selectedCombinations = combinations.slice(0, 10000);
+    const answerPositions = [];
+    for (let index = 0; index < selectedCombinations.length; index += 3) {
+      const positions = [0, 1, 2];
+      for (let position = positions.length - 1; position > 0; position -= 1) {
+        const swapIndex = Math.floor(Math.random() * (position + 1));
+        [positions[position], positions[swapIndex]] = [positions[swapIndex], positions[position]];
+      }
+      answerPositions.push(...positions);
+    }
+
+    return selectedCombinations.map(({ location, type, container, safeInfo }, scenarioIndex) => {
+      const sceneHtml = `<em>${location}</em><p>You notice ${type}. You’re in ${container}.</p><strong>What next?</strong>`;
       const choices = [
-        [safeInfo.action, true, 'Good choice. This keeps you safe. Move away from danger and follow responder instructions.'],
-        [safeInfo.wrong[0], false, 'This action increases risk. Prioritize getting to a safe location.'],
-        [safeInfo.wrong[1], false, 'This approach does not prioritize your safety. Move away from danger when possible.']
+        [safeInfo.wrong[0], false, 'That may be unsafe. Move away if you can.'],
+        [safeInfo.wrong[1], false, 'That may expose you. Choose a safer option.']
       ];
+      if (Math.random() < 0.5) choices.reverse();
+      choices.splice(answerPositions[scenarioIndex], 0, [safeInfo.action, true, safeInfo.why]);
 
       return { scene: sceneHtml, choices: choices };
     });
   }
 
   const scenarios = generateScenarios();
-  let index = 0; let score = 0; let answered = false;
+  let index = 0; let answered = false; let correctAnswers = 0;
   const $ = (id) => document.getElementById(id);
-  function render() { const item = scenarios[index]; answered = false; $('progress').textContent = `Scenario ${index + 1} of ${scenarios.length}`; $('scenario').textContent = String(index + 1).padStart(2, '0'); $('scene').innerHTML = item.scene; $('feedback').textContent = ''; $('feedback').className = ''; $('next').classList.add('hidden'); $('choices').innerHTML = item.choices.map((choice, i) => `<button class="choice" data-i="${i}"><span>${String.fromCharCode(65 + i)}</span>${choice[0]}</button>`).join(''); document.querySelectorAll('.choice').forEach((button) => button.addEventListener('click', () => choose(Number(button.dataset.i)))); }
-  function choose(choiceIndex) { if (answered) return; answered = true; const choice = scenarios[index].choices[choiceIndex]; if (choice[1]) score += 1; document.querySelectorAll('.choice').forEach((button, i) => { button.disabled = true; if (i === choiceIndex) button.classList.add(choice[1] ? 'right' : 'wrong'); }); $('feedback').textContent = choice[2]; $('feedback').className = choice[1] ? 'good' : 'care'; if (score >= 3) unlock(); if (score >= 20) unlockSpecialGame(); $('next').textContent = index === scenarios.length - 1 ? 'Finish practice →' : 'Continue scenario →'; $('next').classList.remove('hidden'); }
-  function unlock() { $('drill').classList.remove('hidden'); $('drill').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  function unlockSpecialGame() { $('special-game-unlock').classList.remove('hidden'); }
-  function hide(spot) { const results = { window: ['Too clear', 'The window leaves you visible from outside. Choose cover that blocks the view.'], desk: ['You may be seen', 'The desk lowers your profile, but the open room still exposes your position.'], room: ['Hidden well', 'Great hiding place. Secure the door, silence devices, stay quiet, and wait for responders.'] }; const result = results[spot]; document.querySelectorAll('[data-spot]').forEach((el) => el.classList.toggle('selected', el.dataset.spot === spot)); $('room-caption').textContent = result[0] + '. ' + result[1]; $('drill-feedback').innerHTML = `<b>${result[0]}.</b> ${result[1]}`; $('drill-feedback').className = spot === 'room' ? 'good' : 'care'; $('replay').classList.remove('hidden'); }
-  document.querySelectorAll('[data-spot]').forEach((element) => element.addEventListener('click', () => hide(element.dataset.spot)));
+  function render() { const item = scenarios[index]; answered = false; $('progress').textContent = `Round ${index + 1}`; $('scenario').textContent = String(index + 1).padStart(2, '0'); $('scene').innerHTML = item.scene; $('feedback').textContent = ''; $('feedback').className = ''; $('next').classList.add('hidden'); $('choices').innerHTML = item.choices.map((choice, i) => `<button class="choice" data-i="${i}"><span>${String.fromCharCode(65 + i)}</span>${choice[0]}</button>`).join(''); document.querySelectorAll('.choice').forEach((button) => button.addEventListener('click', () => choose(Number(button.dataset.i)))); }
+  function choose(choiceIndex) { if (answered) return; answered = true; const choice = scenarios[index].choices[choiceIndex]; const correctChoice = scenarios[index].choices.find((answer) => answer[1]); document.querySelectorAll('.choice').forEach((button, i) => { button.disabled = true; if (i === choiceIndex) button.classList.add(choice[1] ? 'right' : 'wrong'); }); $('feedback').textContent = choice[1] ? `Correct! ${choice[2]}` : `Not quite. Correct answer: ${correctChoice[0]}. Why: ${correctChoice[2]}`; $('feedback').className = choice[1] ? 'good' : 'care'; if (choice[1]) { correctAnswers += 1; if (correctAnswers >= 3) $('start-game').classList.remove('hidden'); } $('next').textContent = index === scenarios.length - 1 ? 'Finish practice →' : 'Next round →'; $('next').classList.remove('hidden'); }
   $('next').addEventListener('click', () => { if (index < scenarios.length - 1) { index += 1; render(); $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
   $('start').addEventListener('click', () => $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }));
-  $('reset').addEventListener('click', () => { index = 0; score = 0; $('drill').classList.add('hidden'); initSpecialGame(); render(); window.scrollTo(0, 0); });
-  $('launch-special-game').addEventListener('click', () => { $('special-game').classList.remove('hidden'); $('special-game').scrollIntoView({ behavior: 'smooth', block: 'start' }); initSpecialGame(); });
+  $('reset').addEventListener('click', () => { index = 0; correctAnswers = 0; $('start-game').classList.add('hidden'); initSpecialGame(); render(); window.scrollTo(0, 0); });
 
   // 3D School Alarm Lockdown Game Logic
   let sgLevel = 1;
@@ -128,12 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const ROOM_COUNT = 120;
   const roomThemes = [
-    ['SCIENCE CLASSROOM', 'SUPPLY CLOSET', 'TEACHER DESK', 'STUDENT TABLES', 'LAB STORAGE', 'WINDOW', '#234f5b', '#2b625f'],
-    ['MAIN CORRIDOR', 'SECURITY OFFICE', 'RECEPTION DESK', 'WAITING BENCHES', 'LOCKERS', 'GLASS EXIT', '#29445f', '#41627c'],
-    ['SCHOOL LIBRARY', 'ARCHIVE ROOM', 'LIBRARIAN DESK', 'READING TABLES', 'BOOKSHELVES', 'LIBRARY WINDOW', '#3c345b', '#5c507a'],
-    ['ART STUDIO', 'SUPPLY ROOM', 'WORK TABLE', 'PROJECT TABLES', 'CANVAS RACK', 'NORTH WINDOW', '#5a3f38', '#765548'],
-    ['CAFETERIA', 'STAFF ROOM', 'SERVICE COUNTER', 'LUNCH TABLES', 'FOOD STORAGE', 'DELIVERY DOOR', '#4b5538', '#66724b'],
-    ['MUSIC ROOM', 'EQUIPMENT ROOM', 'CONDUCTOR DESK', 'PRACTICE SEATS', 'INSTRUMENT RACK', 'SIDE WINDOW', '#304f50', '#42706a']
+    ['SCIENCE CLASSROOM', 'SUPPLY CLOSET', 'TEACHER DESK', 'STUDENT TABLES', 'LAB STORAGE', 'WINDOW', '#1769aa', '#328fc3'],
+    ['MAIN CORRIDOR', 'SECURITY OFFICE', 'RECEPTION DESK', 'WAITING BENCHES', 'LOCKERS', 'GLASS EXIT', '#ad4f1e', '#d67c24'],
+    ['SCHOOL LIBRARY', 'ARCHIVE ROOM', 'LIBRARIAN DESK', 'READING TABLES', 'BOOKSHELVES', 'LIBRARY WINDOW', '#53408f', '#745db8'],
+    ['ART STUDIO', 'SUPPLY ROOM', 'WORK TABLE', 'PROJECT TABLES', 'CANVAS RACK', 'NORTH WINDOW', '#116b55', '#218d68'],
+    ['CAFETERIA', 'STAFF ROOM', 'SERVICE COUNTER', 'LUNCH TABLES', 'FOOD STORAGE', 'DELIVERY DOOR', '#a93c59', '#c85758'],
+    ['MUSIC ROOM', 'EQUIPMENT ROOM', 'CONDUCTOR DESK', 'PRACTICE SEATS', 'INSTRUMENT RACK', 'SIDE WINDOW', '#136b76', '#238e9a']
   ];
   const roomArrangements = [
     { closet: [45, 20], desk: [160, 40], bookshelf: [0, 20], window: [0, -50], door: [45, -25], furniture: [['15px', '', '10px'], ['110px', '', '15px'], ['110px', '', '70px'], ['', '15px', '10px'], ['50%', '', '15px'], ['25%', '', '']] },
@@ -186,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     blackboard.querySelector('span').textContent = layout.labels[0];
     if (layout.colors) {
       if ($('sg-room-backwall')) $('sg-room-backwall').style.background = layout.colors.backwall;
-      if ($('sg-room-floor')) $('sg-room-floor').style.background = `linear-gradient(${layout.colors.floor}, #172925)`;
+      if ($('sg-room-floor')) $('sg-room-floor').style.background = `linear-gradient(${layout.colors.floor}, #17355b)`;
     }
     objects.forEach(([id, position, label]) => {
       const element = $(id);
@@ -232,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isInsideCloset || near('closet')) {
       sgSpot = 'closet';
-      if (!sgRunning) $('sg-room-caption').textContent = '🚪 In the room\'s secure cover area. (High cover - hidden from view)';
+      if (!sgRunning) $('sg-room-caption').textContent = '🚪 Inside closet. Out of sight.';
       promptHtml = isInsideCloset ? 'Press <span class="key-badge">E</span> to Step Out of Closet' : 'Press <span class="key-badge">E</span> to Hide in Closet';
     } else if (near('door', 55, 35)) {
       sgSpot = 'door';
@@ -240,19 +247,19 @@ document.addEventListener('DOMContentLoaded', () => {
       promptHtml = `Press <span class="key-badge">E</span> to ${sgDoorLocked ? 'Unlock' : 'Lock'} Door`;
     } else if (near('desk')) {
       sgSpot = 'desk';
-      if (!sgRunning) $('sg-room-caption').textContent = sgCrouched ? '🧎 Crouched under nearby furniture. (Medium cover)' : '🪑 Near furniture. Press C to crouch under it.';
+      if (!sgRunning) $('sg-room-caption').textContent = sgCrouched ? '🧎 Crouched under a table.' : '🪑 Near a table. Press C to crouch.';
       promptHtml = `Press <span class="key-badge">C</span> to ${sgCrouched ? 'Stand Up' : 'Crouch Under Tables'}`;
     } else if (near('bookshelf')) {
       sgSpot = 'bookshelf';
-      if (!sgRunning) $('sg-room-caption').textContent = '📚 Behind high cover. (Hidden from view)';
+      if (!sgRunning) $('sg-room-caption').textContent = '📚 Behind bookshelf. Out of sight.';
       promptHtml = 'Press <span class="key-badge">E</span> to Hide behind Bookshelf';
     } else if (near('window', 70, 35)) {
       sgSpot = 'window';
-      if (!sgRunning) $('sg-room-caption').textContent = '🪟 Near an opening. (Exposed from outside)';
+      if (!sgRunning) $('sg-room-caption').textContent = '🪟 Window: visible from outside.';
       promptHtml = '⚠️ Move away from the window!';
     } else {
       sgSpot = 'open';
-      if (!sgRunning) $('sg-room-caption').textContent = '🚶 In Open Classroom Floor! Use WASD to move to cover.';
+      if (!sgRunning) $('sg-room-caption').textContent = '🚶 Move to cover.';
       promptHtml = `Press <span class="key-badge">C</span> to ${sgCrouched ? 'Stand Up' : 'Crouch'}`;
     }
 
@@ -333,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keyboard Movement Engine (WASD & Arrows & E & C & L)
   window.addEventListener('keydown', (e) => {
     if ($('special-game') && $('special-game').classList.contains('hidden')) return;
+    if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
 
     const step = sgCrouched ? 8 : 14;
     let handled = false;
@@ -467,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
       $('sg-start-timer-btn').classList.add('hidden');
       $('sg-retry-btn').classList.add('hidden');
       $('sg-next-level-btn').classList.add('hidden');
-      $('sg-feedback-msg').textContent = '🚨 ALARM ACTIVE! Searcher is sweeping the building... Staying hidden...';
+      $('sg-feedback-msg').textContent = '🚨 Alarm! Stay hidden.';
       
       updateSpecialGameUI();
 
@@ -484,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function runSearchSweep() {
     $('sg-search-beam').classList.add('sweeping');
-    $('sg-feedback-msg').textContent = '🔦 Search beam sweeping the room...';
+    $('sg-feedback-msg').textContent = '🔦 Search in progress. Stay hidden.';
 
     setTimeout(() => {
       $('sg-alarm-overlay').classList.remove('active');
@@ -500,41 +508,41 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (sgSpot === 'desk') score += 25;
       else if (sgSpot === 'window') {
         score += 0;
-        failureReasons.push('Staying by the window left you completely visible from outside');
+        failureReasons.push('Window left you visible');
       } else if (sgSpot === 'open') {
         score += 0;
-        failureReasons.push('Standing out in the open floor without cover made you easily visible');
+        failureReasons.push('No cover in the open room');
       }
 
       if (sgDoorLocked) {
         score += 30;
       } else {
-        failureReasons.push('Leaving the door unlocked allowed access into the room');
+        failureReasons.push('Door was unlocked');
       }
 
       if (sgPhoneSilenced) {
         score += 20;
       } else {
-        failureReasons.push('Your phone ringer rang and alerted nearby searchers');
+        failureReasons.push('Phone rang');
       }
 
       if (sgCrouched) {
         score += 10;
       } else {
-        failureReasons.push('Standing up exposed your silhouette');
+        failureReasons.push('Standing made you visible');
       }
 
       if (score >= 75) {
         if (sgLevel < ROOM_COUNT) {
-          $('sg-feedback-msg').innerHTML = `<b>Safe choice in ${levelNames[sgLevel]}.</b><br>You secured the door, silenced your phone, and stayed out of view. Continue following responder instructions.`;
+          $('sg-feedback-msg').innerHTML = `<b>Safe choice!</b><br>Door secure, phone silent, and out of sight. Follow responders.`;
           $('sg-next-level-btn').classList.remove('hidden');
         } else {
-          $('sg-feedback-msg').innerHTML = `<b>Practice complete.</b><br>You rehearsed getting away, getting hidden, and staying out of view across all three areas.`;
+          $('sg-feedback-msg').innerHTML = '<b>Drill complete!</b><br>You practiced moving, hiding, and staying out of sight.';
           $('sg-retry-btn').textContent = 'Repeat drill';
           $('sg-retry-btn').classList.remove('hidden');
         }
       } else {
-        $('sg-feedback-msg').innerHTML = `<b>Review your safety choices.</b><br>${failureReasons.join('. ')}. Try the drill again and prioritize cover, silence, and a secured door.`;
+        $('sg-feedback-msg').innerHTML = `<b>Try again.</b><br>${failureReasons.join('. ')}. Move to cover, lock the door, silence your phone, and crouch.`;
         $('sg-retry-btn').textContent = 'Repeat level';
         $('sg-retry-btn').classList.remove('hidden');
       }
@@ -549,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initSpecialGame();
       $('sg-start-timer-btn').classList.remove('hidden');
       $('sg-retry-btn').classList.add('hidden');
-      $('sg-feedback-msg').textContent = 'Configure the room, then start the drill. This is practice, not live emergency guidance.';
+      $('sg-feedback-msg').textContent = 'Choose your spot and actions. Practice only.';
     });
   }
 
@@ -559,10 +567,9 @@ document.addEventListener('DOMContentLoaded', () => {
       initSpecialGame();
       $('sg-start-timer-btn').classList.remove('hidden');
       $('sg-next-level-btn').classList.add('hidden');
-      $('sg-feedback-msg').textContent = `Welcome to ${roomLayouts[sgLevel].labels[0]}. Configure your hiding spot and safety actions, then start the practice sweep.`;
+      $('sg-feedback-msg').textContent = `${roomLayouts[sgLevel].labels[0]}. Pick your spot and actions.`;
     });
   }
-  $('replay').addEventListener('click', () => { document.querySelectorAll('[data-spot]').forEach((el) => el.classList.remove('selected')); $('room-caption').textContent = 'A safety alert sounds. Choose a hiding place that keeps you out of sight.'; $('drill-feedback').textContent = 'Choose a spot to see the result.'; $('drill-feedback').className = ''; $('replay').classList.add('hidden'); });
   $('alert-form').addEventListener('submit', (event) => { event.preventDefault(); const contact = $('contact').value.trim() || 'your trusted contact'; const where = $('where').value.trim() || 'my current location'; $('preview').textContent = `Preview: “Hi ${contact}, I am safe at ${where}. I am following responder instructions.”`; });
   initSpecialGame();
   render();

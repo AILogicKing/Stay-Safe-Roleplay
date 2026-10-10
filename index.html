@@ -7,20 +7,22 @@
   <link rel="stylesheet" href="styles.css" />
   <style>
     :root {
-      --ink: #18333b;
-      --muted: #5d7075;
-      --paper: #f5f8f7;
+      --ink: #19334e;
+      --muted: #526b7f;
+      --paper: #fff2ca;
       --panel: #ffffff;
-      --line: #d8e4e2;
-      --teal: #146b67;
-      --dark: #173f4b;
-      --coral: #c9534d;
-      --yellow: #e8b94f;
-      --sky: #a9d9d5;
+      --line: #d9e9f4;
+      --teal: #087fae;
+      --dark: #17355b;
+      --coral: #ed5b31;
+      --yellow: #ffe04b;
+      --sky: #35c8d0;
     }
 
     body {
-      background: #f5f8f7;
+      background-color: #f28a24;
+      background-image: radial-gradient(circle, rgba(255, 213, 113, .72) 2px, transparent 2.5px);
+      background-size: 28px 28px;
     }
 
     .app-shell {
@@ -28,7 +30,7 @@
     }
 
     .app-shell::before {
-      background: linear-gradient(90deg, var(--dark) 0 72%, var(--coral) 72% 84%, var(--yellow) 84%);
+      background: linear-gradient(90deg, var(--dark) 0 72%, var(--teal) 72% 84%, var(--coral) 84%);
       content: "";
       height: 7px;
       left: 0;
@@ -49,8 +51,8 @@
     }
 
     .welcome::after {
-      border-color: rgba(20, 107, 103, .18);
-      box-shadow: 10px 10px 0 rgba(20, 107, 103, .08);
+      border-color: rgba(23, 105, 170, .18);
+      box-shadow: 10px 10px 0 rgba(23, 105, 170, .08);
     }
 
     .welcome-mark {
@@ -130,10 +132,10 @@
 
     .welcome {
       align-items: flex-start;
-      background-color: #ffffff;
-      border: 1px solid var(--line);
+      background-color: #ffd166;
+      border: 3px solid #fff7df;
       border-radius: 18px;
-      box-shadow: 0 20px 50px rgba(23, 63, 75, .08);
+      box-shadow: 0 14px 0 rgba(131, 59, 14, .2);
       min-height: min(720px, calc(100vh - 62px));
       overflow: hidden;
       padding: clamp(42px, 8vw, 100px) clamp(28px, 10vw, 150px);
@@ -160,9 +162,12 @@
       max-width: 680px;
     }
 
+    .welcome-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+
     .welcome-button {
-      box-shadow: 0 8px 0 #0d514e;
-      margin-top: 24px;
+      align-items: center;
+      display: inline-flex;
+      box-shadow: 0 8px 0 #07547b;
     }
 
     .intro {
@@ -257,6 +262,66 @@
       padding: 40px;
     }
 
+    .welcome {
+      background-image: radial-gradient(circle, rgba(255, 255, 255, .38) 2px, transparent 2.5px);
+      background-size: 30px 30px;
+    }
+
+    .welcome::before {
+      left: clamp(28px, 10vw, 150px);
+      transform: none;
+      width: 56px;
+    }
+
+    .welcome-mark { box-shadow: 0 8px 22px rgba(18, 52, 90, .18); }
+    .intro aside { background: #fff3e6; border-color: #f0c79f; box-shadow: 8px 8px 0 rgba(18, 52, 90, .08); }
+    .principle-grid article:nth-child(1) { background: #b8f1e8; }
+    .principle-grid article:nth-child(2) { background: #fff078; }
+    .principle-grid article:nth-child(3) { background: #ffc5a2; }
+    .principle-grid article:hover { box-shadow: 0 12px 24px rgba(18, 52, 90, .1); }
+    .game, .special-game { box-shadow: 0 14px 30px rgba(18, 52, 90, .14); }
+    .special-game-unlock { background: #9de8e5; border-color: #fff7df; }
+    .alert { background: #fff078; border-color: #ed5b31; }
+
+    .sg-3d-room { background: #102a49; }
+    .sg-room-ceiling { background: #0d2038; }
+    .sg-room-backwall { background: #1d4268; border-bottom-color: #102a49; }
+    .sg-room-floor { background: linear-gradient(#315a80, #1b3c60); }
+    .sg-blackboard { background: #17395c; border-color: #e8752a; color: #d8eaff; }
+    .sg-door-obj { background: #315f87; border-color: #83b5df; }
+    .sg-door-obj b { color: var(--yellow); }
+    .sg-window-obj { background: rgba(126, 190, 235, .28); border-color: #83b5df; color: #d8eaff; }
+    .sg-closet-obj, .sg-desk-obj, .sg-bookshelf-obj, .sg-student-desk {
+      background: #315a7d;
+      border-color: #7399bb;
+      color: #e5f2ff;
+    }
+    .sg-closet-obj { background: #244b70; }
+    .sg-desk-obj { background: #b6632c; border-color: #ed9a56; }
+    .sg-student-desk { background: #294c6e; }
+    .sg-bookshelf-obj { background: #7c4d30; border-color: #e28a45; }
+    .dpad-btn, .sg-btn-spot, .sg-btn-act, .sg-act-btn { background: #183c63; border-color: #426b94; }
+    .sg-btn-spot, .sg-btn-act, .sg-act-btn { color: #e5f2ff; }
+    .sg-btn-spot small { color: #a8c7e3; }
+    .sg-btn-spot.active, .sg-btn-act.active, .sg-act-btn.active { background: var(--teal); border-color: var(--coral); }
+    .sg-alarm-overlay { background: rgba(232, 117, 42, .25); }
+    .sg-learning-note { color: #d6e9fb; }
+
+    .primary, .secondary, .outline { border-radius: 12px; transition: transform .18s ease, box-shadow .18s ease; }
+    .primary { background: #087fae; box-shadow: 0 4px 0 #07547b; }
+    .primary:hover, .secondary:hover, .outline:hover { transform: translateY(-2px); }
+    .primary:hover { box-shadow: 0 6px 0 #07547b; }
+    .game .game-instruction { color: #d9edff; }
+    .game > #next { display: block; margin-left: auto; }
+    .game > #start-game { display: block; margin: 14px 0 0 auto; text-decoration: none; width: max-content; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #ffe04b; outline-offset: 3px; }
+    .welcome-mark { background: #ed5b31; border: 4px solid #fff7df; box-shadow: 0 7px 0 rgba(131, 59, 14, .2); }
+    .brand > b { background: #ed5b31; }
+    .principle-grid article { border-radius: 12px; }
+    .share-app { border: 3px solid #35c8d0; box-shadow: 0 7px 0 rgba(23, 53, 91, .12); }
+    .game { border: 4px solid #35c8d0; }
+    .special-game { border: 4px solid #ffe04b; }
+
     @media (max-width: 760px) {
       .welcome {
         min-height: calc(100vh - 42px);
@@ -280,24 +345,30 @@
       }
     }
   </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGCJDKYW9X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SGCJDKYW9X');
+  </script>
 </head>
 <body>
   <div class="app-shell">
-    <section class="welcome" id="welcome" aria-labelledby="welcome-title"><div class="welcome-mark" role="img" aria-label="Chicken giving a thumbs up"><span class="chicken-logo"><span class="chicken-face">🐔</span><span class="chicken-thumb">👍</span></span></div><p class="kicker">Safety preparedness practice</p><h1 id="welcome-title">STAY SAFE</h1><p>Build calm, practical habits for getting away, getting hidden, and getting help during a violent emergency. This practice tool does not replace emergency responders or local safety guidance.</p><button class="primary welcome-button" id="continue" type="button">Continue <span>→</span></button></section>
+    <section class="welcome" id="welcome" aria-labelledby="welcome-title"><div class="welcome-mark" role="img" aria-label="Chicken giving a thumbs up"><span class="chicken-logo"><span class="chicken-face">🐔</span><span class="chicken-thumb">👍</span></span></div><p class="kicker">Safety skills practice</p><h1 id="welcome-title">STAY SAFE</h1><p>Get away if it’s safe. Hide if you can’t. Get help when you can. In an emergency, follow responders.</p><button class="primary welcome-button" id="continue" type="button">Let’s go <span>→</span></button></section>
     <div id="app-content" class="hidden">
-      <header><a class="brand" href="#top"><b role="img" aria-label="Chicken giving a thumbs up"><span class="chicken-logo"><span class="chicken-face">🐔</span><span class="chicken-thumb">👍</span></span></b><span><strong>Stay Safe Steady</strong><small>Safety preparedness practice</small></span></a><span id="progress">Scenario 1 of 4</span><button id="reset" class="link-btn">Reset</button></header>
+      <header><a class="brand" href="#top"><b role="img" aria-label="Chicken giving a thumbs up"><span class="chicken-logo"><span class="chicken-face">🐔</span><span class="chicken-thumb">👍</span></span></b><span><strong>Stay Safe Steady</strong><small>Safety preparedness practice</small></span></a><span id="progress">Round 1</span><button id="reset" class="link-btn">Reset</button></header>
       <main id="top">
-      <section class="intro"><div><p class="kicker">Calm practice</p><h1>Know your next safe step.</h1><p>Violence involving guns can be frightening and unpredictable. Preparing ahead can help you recognize safer options: move away when a route is safe, get out of sight when it is not, and contact emergency responders when you can.</p><button id="start" class="primary">Begin practice <span>→</span></button></div><aside><b>Real emergency?</b><h2>Call local emergency services first.</h2><p>This app is for preparation, not live guidance. Follow emergency responder instructions and only act when you can do so safely.</p></aside></section>
-      <section class="share-app" aria-labelledby="share-title"><div><p class="kicker">Share Stay Safe Steady</p><h2 id="share-title">Bring practice with you.</h2><p>Scan this code to open Stay Safe Steady on another device.</p><a id="share-link" href="#" target="_blank" rel="noopener">Open the app link</a></div><img id="share-qr" class="share-qr" alt="QR code to open Stay Safe Steady" /></section>
-      <section class="principles"><p class="kicker">The safety sequence</p><h2>Three actions. One clear priority: create distance and get help.</h2><div class="principle-grid"><article><b>01</b><h3>Get away</h3><p>Move away from danger if you can do so safely. Leave belongings behind.</p></article><article><b>02</b><h3>Get hidden</h3><p>If leaving is unsafe, secure yourself out of view and silence your phone.</p></article><article><b>03</b><h3>Get help</h3><p>When safe, contact emergency responders and share your location.</p></article></div></section>
-      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Decision practice</p><h2 id="questionTitle">Choose your safest next step</h2><p class="game-instruction">Read the scenario, pause, and choose the response that best protects you. There is no shame in learning.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div id="scene"></div><div><p class="choice-label">Your next move</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Continue scenario →</button></section>
-      <section class="special-game-unlock" id="special-game-unlock"><p class="kicker">Interactive school drill</p><h2>Practice the safety sequence in 3D</h2><p>Try the classroom drill whenever you are ready. Scenario practice and the drill reinforce the same habits: create distance, get out of view, and get help when safe.</p><button id="launch-special-game" class="primary">Jump to school drill</button></section>
-      <section class="special-game" id="special-game">
+      <section class="intro"><div><p class="kicker">Practice together</p><h1>Find your safe next step.</h1><p>Leave only if it’s safe. If you can’t leave, hide. Get help when you can.</p><button id="start" class="primary">Start practice <span>→</span></button></div><aside><b>Need help now?</b><h2>Call local emergency services when safe.</h2><p>This is practice, not live help. Follow responder instructions.</p></aside></section>
+      <section class="share-app" aria-labelledby="share-title"><div><p class="kicker">Share the app</p><h2 id="share-title">Practice anywhere.</h2><p>Scan to open on another device.</p><a id="share-link" href="#" target="_blank" rel="noopener">Open app link</a></div><img id="share-qr" class="share-qr" alt="QR code to open Stay Safe Steady" /></section>
+      <section class="principles"><p class="kicker">Three safety steps</p><h2>Leave. Hide. Get help.</h2><div class="principle-grid"><article><b>01</b><h3>Get away</h3><p>Leave by a safe route. Leave your things.</p></article><article><b>02</b><h3>Get hidden</h3><p>If you can’t leave, get out of sight. Silence your phone.</p></article><article><b>03</b><h3>Get help</h3><p>When safe, call responders and share where you are.</p></article></div></section>
+      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Practice round</p><h2 id="questionTitle">What’s your safest next step?</h2><p class="game-instruction">Pause. Look. Choose.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div id="scene"></div><div><p class="game-instruction">Safety rule: Leave only if it’s safe. Otherwise hide, stay quiet, and follow responders. Get help when safe.</p><p class="choice-label">What would you do?</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Next round →</button><a id="start-game" class="primary hidden" href="game.html">Start game <span>→</span></a></section>
+      <section class="special-game hidden" id="special-game">
         <div class="special-game-heading">
           <div>
             <p class="kicker">Interactive safety drill</p>
             <h2>Practice securing a classroom</h2>
-            <p>Use this simulation to rehearse moving out of view, securing a door, silencing your phone, and staying low while you wait for responder instructions.</p>
+            <p>Find cover, secure the door, silence your phone, and wait for responders.</p>
           </div>
           <div class="sg-status-pills">
             <span id="sg-level-badge">Area 1: Science Classroom</span>
@@ -308,7 +379,7 @@
           <div class="sg-3d-room" id="sg-3d-room" tabindex="0">
             <div class="sg-alarm-overlay" id="sg-alarm-overlay"></div>
             <div class="sg-search-beam" id="sg-search-beam"></div>
-            <div class="sg-key-hints"><span class="key-badge">WASD</span> Walk | <span class="key-badge">E</span> Hide / Interact | <span class="key-badge">C</span> Crouch under tables</div>
+            <div class="sg-key-hints"><span class="key-badge">WASD</span> Move | <span class="key-badge">E</span> Hide | <span class="key-badge">C</span> Crouch</div>
             <div class="sg-interact-prompt hidden" id="sg-interact-prompt">Press <span class="key-badge">E</span> to Hide</div>
             <div class="sg-room-ceiling">
               <div class="sg-light"></div>
@@ -333,11 +404,11 @@
                 <button class="dpad-btn" id="dpad-right" title="Move Right (D / ➡️)">▶</button>
               </div>
             </div>
-            <div class="sg-room-caption" id="sg-room-caption">Classroom Alarm! Use WASD to walk, E to hide in closet, C to crouch under tables.</div>
+            <div class="sg-room-caption" id="sg-room-caption">Practice: move, hide, crouch.</div>
           </div>
           <div class="sg-controls-panel">
             <div class="sg-control-section">
-              <p class="choice-label">1. Choose 3D Hiding Spot</p>
+              <p class="choice-label">1. Pick a hiding spot</p>
               <div class="sg-spots-grid">
                 <button class="sg-btn-spot" data-sgspot="closet">🚪 Supply Closet <small>(High Cover)</small></button>
                 <button class="sg-btn-spot" data-sgspot="desk">🪑 Heavy Desk <small>(Medium Cover)</small></button>
@@ -346,18 +417,18 @@
               </div>
             </div>
             <div class="sg-control-section">
-              <p class="choice-label">2. Critical Safety Actions</p>
+              <p class="choice-label">2. Safety actions</p>
               <div class="sg-actions-grid">
                 <button class="sg-btn-act" id="sg-act-door">🔒 Door: <b>UNLOCKED</b></button>
                 <button class="sg-act-btn" id="sg-act-phone">📱 Phone: <b>RINGER ON</b></button>
                 <button class="sg-act-btn" id="sg-act-posture">🧎 Position: <b>STANDING</b></button>
               </div>
-              <p class="sg-learning-note"><b>What this teaches:</b> secure the barrier, silence avoidable sound, and lower your profile. These choices support hiding; they never replace leaving when a safe route is available.</p>
+              <p class="sg-learning-note"><b>Remember:</b> Leave if it’s safe. If not, secure the door, silence your phone, and stay low.</p>
             </div>
             <div class="sg-status-area">
-              <p id="sg-feedback-msg" aria-live="polite">Configure the room, then start the drill. This is practice, not live emergency guidance.</p>
+              <p id="sg-feedback-msg" aria-live="polite">Choose a spot and actions. This is practice, not live help.</p>
               <div class="sg-btn-row">
-                <button id="sg-start-timer-btn" class="primary">Start Lockdown 🚨</button>
+                <button id="sg-start-timer-btn" class="primary">Start drill 🚨</button>
                 <button id="sg-retry-btn" class="outline hidden">Retry Level 🔄</button>
                 <button id="sg-next-level-btn" class="primary hidden">Next Area →</button>
               </div>
@@ -365,8 +436,7 @@
           </div>
         </div>
       </section>
-      <section class="drill hidden" id="drill"><div class="drill-heading"><div><p class="kicker">Unlocked at 3 correct answers</p><h2>Field drill: find safe cover.</h2><p>You are the bald character at the start point. Choose a place to hide and read the safety result.</p></div><span>3D drill</span></div><div class="drill-grid"><div class="room" aria-label="3D room with hiding places"><div class="ceiling"></div><div class="exit">EXIT</div><button class="spot window" data-spot="window">WINDOW</button><button class="spot desk" data-spot="desk">HEAVY DESK</button><button class="spot safe-room" data-spot="room">LOCKED ROOM</button><div class="avatar" aria-label="Bald player character"><i></i><b></b></div><p id="room-caption">A safety alert sounds. Choose a hiding place that keeps you out of sight.</p></div><div><p class="choice-label">Choose a hiding place</p><button class="drill-choice" data-spot="window"><b>Hide by the window</b><small>Visible from outside.</small></button><button class="drill-choice" data-spot="desk"><b>Hide behind the heavy desk</b><small>Low cover, but the room is open.</small></button><button class="drill-choice" data-spot="room"><b>Move into the locked room</b><small>Out of view with a door to secure.</small></button><p id="drill-feedback" aria-live="polite">Choose a spot to see the result.</p><button id="replay" class="outline hidden">Replay drill</button></div></div></section>
-      <section class="alert"><div><p class="kicker">Your safety circle</p><h2>Practice an alert you can send when safe.</h2><p>Do not stop or expose yourself to send a message. Contact responders first during immediate danger.</p></div><form id="alert-form"><label for="contact">Trusted contact</label><input id="contact" placeholder="e.g. Sam" /><label for="where">Where are you?</label><input id="where" placeholder="e.g. north library entrance" /><button class="outline" type="submit">Preview alert →</button><small id="preview">Nothing will be sent from this practice app.</small></form></section>
+      <section class="alert"><div><p class="kicker">Trusted contact</p><h2>Send a note when safe.</h2><p>Get safe first. Call responders before messaging.</p></div><form id="alert-form"><label for="contact">Trusted contact</label><input id="contact" placeholder="e.g. Sam" /><label for="where">Where are you?</label><input id="where" placeholder="e.g. north library entrance" /><button class="outline" type="submit">Preview alert →</button><small id="preview">Practice only. Nothing is sent.</small></form></section>
       </main>
     </div>
   </div>
