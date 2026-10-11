@@ -114,10 +114,109 @@
     doorKnob.position.set(1.78, 1.24, 0.16);
     doorHinge.add(doorKnob);
 
+    // Classroom details: all scenery, none of it draggable.
+    const chalkWhite = makeMaterial('#fdfdf2', { roughness: 1 });
+    const cork = makeMaterial('#c98f55');
+    const glass = makeMaterial('#d8f0fa', { emissive: '#8fc9e0', emissiveIntensity: 0.3 });
+    const noteColors = ['#ffe04b', '#35c8d0', '#ff9a54', '#f2a7c3', '#9de8e5', '#84bb4e'];
+
+    addBox(scene, [2.4, 1.35, 0.08], materials.trim, [-3.05, 2.0, -4.79], false);
     addBox(scene, [2.2, 1.15, 0.12], materials.chalk, [-3.05, 2.0, -4.77], false);
-    addBox(scene, [1.8, 1.2, 0.08], materials.blueWall, [-4.83, 1.9, -0.3], false);
-    addBox(scene, [0.08, 1.35, 0.13], materials.trim, [-4.75, 1.9, -0.3], false);
-    addBox(scene, [0.08, 1.35, 0.13], materials.trim, [-4.91, 1.9, -0.3], false);
+    addBox(scene, [1.3, 0.04, 0.01], chalkWhite, [-3.25, 2.3, -4.705], false);
+    addBox(scene, [1.0, 0.04, 0.01], chalkWhite, [-3.4, 2.12, -4.705], false);
+    addBox(scene, [1.5, 0.04, 0.01], chalkWhite, [-3.15, 1.94, -4.705], false);
+    addBox(scene, [0.5, 0.04, 0.01], makeMaterial('#ffe04b'), [-2.55, 2.3, -4.705], false);
+    addBox(scene, [2.3, 0.06, 0.16], materials.woodLight, [-3.05, 1.38, -4.72], false);
+
+    addBox(scene, [0.06, 1.2, 1.7], glass, [-4.84, 1.9, -2.2], false);
+    addBox(scene, [0.12, 0.1, 1.9], materials.trim, [-4.82, 2.55, -2.2], false);
+    addBox(scene, [0.12, 0.1, 1.9], materials.trim, [-4.82, 1.25, -2.2], false);
+    addBox(scene, [0.12, 1.4, 0.1], materials.trim, [-4.82, 1.9, -3.1], false);
+    addBox(scene, [0.12, 1.4, 0.1], materials.trim, [-4.82, 1.9, -1.3], false);
+    addBox(scene, [0.1, 1.2, 0.06], materials.trim, [-4.82, 1.9, -2.2], false);
+    addBox(scene, [0.1, 0.06, 1.7], materials.trim, [-4.82, 1.9, -2.2], false);
+    addBox(scene, [0.25, 0.06, 1.9], materials.woodLight, [-4.78, 1.22, -2.2], false);
+
+    addBox(scene, [2.3, 1.3, 0.06], materials.trim, [3.0, 1.95, -4.79], false);
+    addBox(scene, [2.14, 1.14, 0.06], cork, [3.0, 1.95, -4.76], false);
+    [[2.4, 2.3], [3.0, 2.2], [3.6, 2.3], [2.55, 1.7], [3.2, 1.65], [3.75, 1.75]].forEach(([x, y], index) => {
+      addBox(scene, [0.4, 0.4, 0.012], makeMaterial(noteColors[index]), [x, y, -4.725], false);
+    });
+
+    const clockRim = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.05, 28), materials.trim);
+    clockRim.rotation.x = Math.PI / 2;
+    clockRim.position.set(0, 3.2, -4.78);
+    scene.add(clockRim);
+    const clockFace = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 28), makeMaterial('#fffdf8'));
+    clockFace.rotation.x = Math.PI / 2;
+    clockFace.position.set(0, 3.2, -4.75);
+    scene.add(clockFace);
+    addBox(scene, [0.035, 0.18, 0.02], materials.trim, [0, 3.27, -4.72], false);
+    addBox(scene, [0.13, 0.03, 0.02], materials.door, [0.06, 3.2, -4.72], false);
+
+    [[-3.1, '#ed5b31'], [-1.9, '#35c8d0']].forEach(([z, color]) => {
+      addBox(scene, [0.05, 1.05, 0.8], materials.trim, [4.87, 2.0, z], false);
+      addBox(scene, [0.05, 0.9, 0.65], makeMaterial(color), [4.85, 2.0, z], false);
+      addBox(scene, [0.02, 0.12, 0.5], chalkWhite, [4.82, 2.25, z], false);
+      addBox(scene, [0.02, 0.5, 0.4], makeMaterial('#ffe04b'), [4.82, 1.9, z], false);
+    });
+
+    const shelf = new THREE.Group();
+    shelf.position.set(-4.62, 0, -4.0);
+    scene.add(shelf);
+    addBox(shelf, [0.06, 1.7, 1.6], materials.wood, [-0.22, 0.85, 0]);
+    addBox(shelf, [0.5, 1.7, 0.06], materials.wood, [0, 0.85, -0.77]);
+    addBox(shelf, [0.5, 1.7, 0.06], materials.wood, [0, 0.85, 0.77]);
+    for (const boardY of [0.05, 0.55, 1.05, 1.55, 1.7]) addBox(shelf, [0.5, 0.05, 1.6], materials.woodLight, [0, boardY, 0]);
+    [0.075, 0.575, 1.075].forEach((baseY, row) => {
+      for (let book = 0; book < 8; book += 1) {
+        const height = 0.28 + ((book * 7 + row * 3) % 4) * 0.04;
+        addBox(shelf, [0.3, height, 0.1], makeMaterial(noteColors[(book + row * 2) % noteColors.length]), [0.02, baseY + height / 2, -0.62 + book * 0.18], false);
+      }
+    });
+
+    const teacherDesk = new THREE.Group();
+    teacherDesk.position.set(-3.0, 0, -3.9);
+    scene.add(teacherDesk);
+    addBox(teacherDesk, [1.7, 0.1, 0.85], materials.wood, [0, 0.78, 0]);
+    addBox(teacherDesk, [0.5, 0.6, 0.75], materials.woodLight, [0.5, 0.45, 0]);
+    for (const legX of [-0.78, 0.78]) {
+      for (const legZ of [-0.36, 0.36]) addBox(teacherDesk, [0.08, 0.74, 0.08], materials.trim, [legX, 0.37, legZ], false);
+    }
+    addBox(teacherDesk, [0.4, 0.12, 0.3], makeMaterial('#ed5b31'), [-0.4, 0.89, 0.1], false);
+    addBox(teacherDesk, [0.36, 0.1, 0.26], makeMaterial('#087fae'), [-0.4, 1.0, 0.1], false);
+    const globe = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 16), makeMaterial('#35a9bd'));
+    globe.position.set(0.55, 1.1, -0.1);
+    teacherDesk.add(globe);
+    const globeStand = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.08, 0.2, 12), materials.trim);
+    globeStand.position.set(0.55, 0.93, -0.1);
+    teacherDesk.add(globeStand);
+
+    const plant = new THREE.Group();
+    plant.position.set(4.25, 0, -4.2);
+    scene.add(plant);
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.2, 0.42, 16), materials.door);
+    pot.position.y = 0.21;
+    pot.castShadow = true;
+    plant.add(pot);
+    [[0, 0.7, 0, 0.3], [-0.15, 0.95, 0.05, 0.22], [0.15, 1.0, -0.05, 0.24]].forEach(([x, y, z, radius]) => {
+      const leaves = new THREE.Mesh(new THREE.SphereGeometry(radius, 14, 12), makeMaterial('#3aa655'));
+      leaves.position.set(x, y, z);
+      leaves.castShadow = true;
+      plant.add(leaves);
+    });
+
+    addBox(scene, [3.4, 0.02, 2.0], materials.trim, [0, 0.02, -0.6], false);
+    addBox(scene, [3.1, 0.02, 1.7], makeMaterial('#ffbd69'), [0, 0.032, -0.6], false);
+
+    addBox(scene, [0.1, 0.2, 10], materials.trim, [-4.85, 0.1, 0], false);
+    addBox(scene, [0.1, 0.2, 10], materials.trim, [4.85, 0.1, 0], false);
+    addBox(scene, [3.73, 0.2, 0.1], materials.trim, [-2.985, 0.1, -4.8], false);
+    addBox(scene, [3.73, 0.2, 0.1], materials.trim, [2.985, 0.1, -4.8], false);
+    addBox(scene, [0.04, 0.08, 10], makeMaterial('#35c8d0'), [-4.88, 1.0, 0], false);
+    addBox(scene, [0.04, 0.08, 10], makeMaterial('#ed5b31'), [4.88, 1.0, 0], false);
+    addBox(scene, [3.73, 0.08, 0.04], makeMaterial('#35c8d0'), [-2.985, 1.0, -4.78], false);
+    addBox(scene, [3.73, 0.08, 0.04], makeMaterial('#ed5b31'), [2.985, 1.0, -4.78], false);
 
     const targets = [];
     const targetSpots = [new THREE.Vector3(-0.78, 0, -2.55), new THREE.Vector3(0.78, 0, -2.55)];
@@ -237,15 +336,25 @@
         targetSpots[index].set(furnitureRound.targets[index], 0, furnitureRound.targetZ);
         targets[index].position.set(furnitureRound.targets[index], 0.025, furnitureRound.targetZ);
       });
+      extraMovables.forEach((item) => item.position.copy(item.userData.home.position));
     }
 
     const cabinet = new THREE.Group();
-    cabinet.position.set(3.75, 0, 1.1);
+    cabinet.position.set(4.5, 0, -1.0);
+    cabinet.rotation.y = -Math.PI / 2;
     scene.add(cabinet);
     addBox(cabinet, [1.05, 1.72, 0.58], materials.robotBlue, [0, 0.86, 0]);
     for (const shelfY of [0.38, 0.9, 1.42]) {
       addBox(cabinet, [0.92, 0.07, 0.62], materials.woodLight, [0, shelfY, 0.03]);
     }
+
+    // Every classroom item is draggable; any two pieces can fill the doorway markers.
+    const extraMovables = [teacherDesk, shelf, plant, cabinet];
+    extraMovables.forEach((item) => {
+      item.userData.home = { position: item.position.clone() };
+      item.children.forEach((child) => { child.userData.dragRoot = item; });
+    });
+    const allMovables = () => [...furniture, ...extraMovables];
 
     const bot = new THREE.Group();
     scene.add(bot);
@@ -449,6 +558,16 @@
       return Math.abs(desk.position.x - target.x) < 0.58 && Math.abs(desk.position.z - target.z) < 0.56;
     }
 
+    // A piece only counts toward one marker.
+    function markerFill() {
+      const used = new Set();
+      return targetSpots.map((spot) => {
+        const item = allMovables().find((candidate) => !used.has(candidate) && isInTarget(candidate, spot));
+        if (item) used.add(item);
+        return Boolean(item);
+      });
+    }
+
     function isAtHideSpot() {
       const spot = inCorridor ? corridorSpot : hideSpot;
       return Math.hypot(avatar.position.x - spot.x, avatar.position.z - spot.z) < 0.78;
@@ -510,8 +629,8 @@
       }
 
       if (nextZ < -4.2 && Math.abs(nextX) < 1) {
-        const placed = furniture.filter((item, index) => isInTarget(item, targetSpots[index])).length;
-        if (placed === furniture.length) {
+        const placed = markerFill().filter(Boolean).length;
+        if (placed === targetSpots.length) {
           status.textContent = 'The door is blocked by furniture. Move a piece away to go out.';
           return;
         }
@@ -566,11 +685,12 @@
     });
 
     function updatePlacementStatus() {
-      const placed = furniture.filter((item, index) => isInTarget(item, targetSpots[index])).length;
+      const filled = markerFill();
+      const placed = filled.filter(Boolean).length;
       const atHideSpot = isAtHideSpot();
       hideButton.disabled = !unlocked || !atHideSpot || avatarHidden || timerExpired || challengeComplete;
       targets.forEach((target, index) => {
-        const isPlaced = isInTarget(furniture[index], targetSpots[index]);
+        const isPlaced = filled[index];
         target.material.color.set(isPlaced ? '#51c878' : '#35c8d0');
         target.material.emissive.set(isPlaced ? '#16843e' : '#087f89');
       });
@@ -613,7 +733,7 @@
     canvas.addEventListener('pointerdown', (event) => {
       if (!unlocked || testing || timerExpired || challengeComplete) return;
       updatePointer(event);
-      const intersections = raycaster.intersectObjects(furniture.flatMap((item) => item.children), false);
+      const intersections = raycaster.intersectObjects(allMovables().flatMap((item) => item.children), false);
       const hit = intersections.find((intersection) => intersection.object.userData.dragRoot);
       if (!hit) return;
       dragging = hit.object.userData.dragRoot;
@@ -643,8 +763,8 @@
       testing = true;
       testButton.disabled = true;
       resetButton.disabled = true;
-      const placed = furniture.filter((item, index) => isInTarget(item, targetSpots[index])).length;
-      const blocked = placed === furniture.length;
+      const placed = markerFill().filter(Boolean).length;
+      const blocked = placed === targetSpots.length;
       const startZ = bot.position.z;
       const endZ = blocked ? -3.12 : 0.9;
       const startTime = performance.now();
@@ -664,7 +784,7 @@
         resetButton.disabled = false;
         status.textContent = blocked
           ? 'Barrier holds! The practice bot stopped at the furniture. Stay out of sight and follow responders.'
-          : `Barrier incomplete: ${placed} of ${furniture.length} pieces in place. The bot reached the doorway.`;
+          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The bot reached the doorway.`;
       }
 
       requestAnimationFrame(moveBot);
