@@ -660,7 +660,7 @@
         }
         updateCountdown();
         updatePlacementStatus();
-        if (timerExpired) finishRound('Time is up!');
+        if (timerExpired) finishRound('Time is up!', true);
       }, 1000);
     }
 
@@ -771,14 +771,16 @@
     });
 
     let roundFinished = false;
-    function setRun(show) {
-      if (runAlert) runAlert.classList.toggle('hidden', !show);
+    function setRun(show, text = 'RUN!') {
+      if (!runAlert) return;
+      runAlert.textContent = text;
+      runAlert.classList.toggle('hidden', !show);
     }
-    function finishRound(message) {
+    function finishRound(message, failed = false) {
       if (roundFinished) return;
       roundFinished = true;
       chasing = false;
-      setRun(false);
+      setRun(failed, 'FAIL!');
       unlocked = false;
       clearInterval(timerInterval);
       timerInterval = null;
@@ -803,13 +805,13 @@
         const dx = avatar.position.x - bot.position.x;
         const dz = avatar.position.z - bot.position.z;
         const dist = Math.hypot(dx, dz);
-        const end = (message) => {
+        const end = (message, failed = false) => {
           testing = false;
-          finishRound(message);
+          finishRound(message, failed);
         };
         if (avatarHidden) return end('You hid in time! The intruder lost track of you.');
-        if (dist < 0.6) return end('The intruder caught up with you. Get to a hiding spot sooner next time.');
-        if (now - chaseStart > 15000) return end('The intruder cornered you. Find a hiding spot faster next time.');
+        if (dist < 0.6) return end('The intruder caught up with you. Get to a hiding spot sooner next time.', true);
+        if (now - chaseStart > 15000) return end('The intruder cornered you. Find a hiding spot faster next time.', true);
         bot.position.x += (dx / dist) * 2.3 * dt;
         bot.position.z += (dz / dist) * 2.3 * dt;
         bot.rotation.y = Math.atan2(dx, dz);
