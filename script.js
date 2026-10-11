@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
+  document.getElementById('main-page').addEventListener('click', () => {
+    document.getElementById('app-content').classList.add('hidden');
+    document.getElementById('welcome').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   const locations = ['a community center', 'a school', 'a workplace', 'a home', 'a library', 'a store', 'a bus', 'a train', 'an office building', 'a park', 'a mall', 'a café', 'a restaurant', 'a gym', 'a movie theater', 'a parking lot', 'a street', 'an apartment building', 'a hotel', 'a hospital'];
   const scenarioTypes = ['loud noise', 'running people', 'unusual commotion', 'shouting', 'blocked exit', 'unfamiliar person', 'sounds of danger', 'alarm activation', 'emergency vehicle sounds', 'yelling'];
   const containerTypes = ['a room with a lock', 'a building with exits', 'an outdoor area', 'a vehicle', 'a large room', 'a small space', 'a multi-level building', 'an open floor plan', 'a confined space', 'a space with furniture'];
