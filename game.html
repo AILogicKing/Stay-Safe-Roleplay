@@ -49,7 +49,6 @@
     .barrier-actions { align-self: end; display: flex; flex-wrap: wrap; gap: 10px; }
     .barrier-actions button { border: 0; border-radius: 10px; font-weight: 800; padding: 12px 16px; }
     #barrier-start-timer, #barrier-test { background: var(--blue); box-shadow: 0 4px 0 #07547b; color: white; }
-    #barrier-reset { background: white; border: 2px solid var(--blue); color: var(--blue); }
     .barrier-actions button:disabled, #avatar-hide:disabled { cursor: not-allowed; opacity: .55; }
     #avatar-hide { background: transparent; border: 2px solid var(--blue); border-radius: 9px; color: var(--blue); font-weight: 800; padding: 11px; }
     button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
@@ -72,7 +71,7 @@
 <body>
   <div class="game-page">
     <header class="game-header">
-      <a href="index.html">← Back to practice</a>
+      <a href="index.html#lobby">← Back to practice</a>
       <span>Stay Safe Steady</span>
     </header>
     <main>
@@ -100,7 +99,6 @@
             <div class="barrier-actions">
               <button id="barrier-start-timer" type="button">Start timer</button>
               <button id="barrier-test" type="button" disabled>Test barrier</button>
-              <button id="barrier-reset" type="button">Reset furniture</button>
             </div>
           </div>
         </div>

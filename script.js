@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  sessionStorage.removeItem('gameUnlocked');
   const shareUrl = 'https://ailogicking.github.io/Stay-Safe-Roleplay/';
   const shareLink = document.getElementById('share-link');
   const shareQr = document.getElementById('share-qr');
@@ -74,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let index = 0; let answered = false; let correctStreak = 0;
   const $ = (id) => document.getElementById(id);
   function render() { const item = scenarios[index]; answered = false; $('progress').textContent = `Round ${index + 1}`; $('scenario').textContent = String(index + 1).padStart(2, '0'); $('scene').innerHTML = item.scene; $('feedback').textContent = ''; $('feedback').className = ''; $('next').classList.add('hidden'); $('choices').innerHTML = item.choices.map((choice, i) => `<button class="choice" data-i="${i}"><span>${String.fromCharCode(65 + i)}</span>${choice[0]}</button>`).join(''); document.querySelectorAll('.choice').forEach((button) => button.addEventListener('click', () => choose(Number(button.dataset.i)))); }
-  function choose(choiceIndex) { if (answered) return; answered = true; const choice = scenarios[index].choices[choiceIndex]; const correctChoice = scenarios[index].choices.find((answer) => answer[1]); document.querySelectorAll('.choice').forEach((button, i) => { button.disabled = true; if (i === choiceIndex) button.classList.add(choice[1] ? 'right' : 'wrong'); }); $('feedback').textContent = choice[1] ? `Correct! ${choice[2]}` : `Not quite. Correct answer: ${correctChoice[0]}. Why: ${correctChoice[2]}`; $('feedback').className = choice[1] ? 'good' : 'care'; correctStreak = choice[1] ? correctStreak + 1 : 0; if (correctStreak >= 3) $('start-game').classList.remove('hidden'); $('next').textContent = index === scenarios.length - 1 ? 'Finish practice →' : 'Next round →'; $('next').classList.remove('hidden'); }
+  function choose(choiceIndex) { if (answered) return; answered = true; const choice = scenarios[index].choices[choiceIndex]; const correctChoice = scenarios[index].choices.find((answer) => answer[1]); document.querySelectorAll('.choice').forEach((button, i) => { button.disabled = true; if (i === choiceIndex) button.classList.add(choice[1] ? 'right' : 'wrong'); }); $('feedback').textContent = choice[1] ? `Correct! ${choice[2]}` : `Not quite. Correct answer: ${correctChoice[0]}. Why: ${correctChoice[2]}`; $('feedback').className = choice[1] ? 'good' : 'care'; correctStreak = choice[1] ? correctStreak + 1 : 0; if (correctStreak >= 3) { $('start-game').classList.remove('hidden'); sessionStorage.setItem('gameUnlocked', '1'); } $('next').textContent = index === scenarios.length - 1 ? 'Finish practice →' : 'Next round →'; $('next').classList.remove('hidden'); }
   $('next').addEventListener('click', () => { if (index < scenarios.length - 1) { index += 1; render(); $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
   $('start').addEventListener('click', () => $('game').scrollIntoView({ behavior: 'smooth', block: 'start' }));
-  $('reset').addEventListener('click', () => { index = 0; correctStreak = 0; $('start-game').classList.add('hidden'); initSpecialGame(); render(); window.scrollTo(0, 0); });
+  $('reset').addEventListener('click', () => { index = 0; correctStreak = 0; sessionStorage.removeItem('gameUnlocked'); $('start-game').classList.add('hidden'); initSpecialGame(); render(); window.scrollTo(0, 0); });
 
   // 3D School Alarm Lockdown Game Logic
   let sgLevel = 1;
@@ -573,4 +574,5 @@ document.addEventListener('DOMContentLoaded', () => {
   $('alert-form').addEventListener('submit', (event) => { event.preventDefault(); const contact = $('contact').value.trim() || 'your trusted contact'; const where = $('where').value.trim() || 'my current location'; $('preview').textContent = `Preview: “Hi ${contact}, I am safe at ${where}. I am following responder instructions.”`; });
   initSpecialGame();
   render();
+  if (location.hash === '#lobby') document.getElementById('continue').click();
 });

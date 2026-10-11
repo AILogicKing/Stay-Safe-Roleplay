@@ -1,4 +1,8 @@
 (() => {
+  if (sessionStorage.getItem('gameUnlocked') !== '1') {
+    location.replace('index.html#lobby');
+    return;
+  }
   const threeUrl = 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
   const section = document.getElementById('barrier-practice');
   const canvas = document.getElementById('barrier-canvas');
@@ -6,9 +10,8 @@
   const status = document.getElementById('barrier-status');
   const countdown = document.getElementById('barrier-countdown');
   const testButton = document.getElementById('barrier-test');
-  const resetButton = document.getElementById('barrier-reset');
   const hideButton = document.getElementById('avatar-hide');
-  if (!section || !canvas || !startTimerButton || !status || !countdown || !testButton || !resetButton || !hideButton) return;
+  if (!section || !canvas || !startTimerButton || !status || !countdown || !testButton || !hideButton) return;
 
   let game;
   let loading = false;
@@ -607,6 +610,7 @@
         }
         updateCountdown();
         updatePlacementStatus();
+        if (timerExpired) finishRound('Time is up!');
       }, 1000);
     }
 
@@ -690,7 +694,23 @@
       }
     });
 
+    let roundFinished = false;
+    function finishRound(message) {
+      if (roundFinished) return;
+      roundFinished = true;
+      unlocked = false;
+      clearInterval(timerInterval);
+      timerInterval = null;
+      sessionStorage.removeItem('gameUnlocked');
+      hideButton.disabled = true;
+      testButton.disabled = true;
+      startTimerButton.disabled = true;
+      status.textContent = `${message} Round over. Heading back to the quiz lobby...`;
+      setTimeout(() => location.assign('index.html#lobby'), 4000);
+    }
+
     function updatePlacementStatus() {
+      if (roundFinished) return;
       const filled = markerFill();
       const placed = filled.filter(Boolean).length;
       const atHideSpot = isAtHideSpot();
@@ -709,14 +729,13 @@
           status.textContent = inCorridor
             ? `You got out and hid in the corridor with ${secondsLeft} seconds left. Stay quiet and follow responders.`
             : `You hid and built the barrier with ${secondsLeft} seconds left. Test the barrier.`;
+          if (inCorridor) finishRound(status.textContent);
         } else if (timerExpired) {
           testButton.disabled = true;
-          status.textContent = 'Time is up. Reset furniture to try again.';
+          status.textContent = 'Time is up!';
         } else if (challengeComplete) {
           testButton.disabled = false;
-          status.textContent = inCorridor
-            ? `Hidden in the corridor. ${secondsLeft} seconds remained. Reset to play again.`
-            : `Barrier ready. ${secondsLeft} seconds remained. Test it or start a new round.`;
+          status.textContent = `Barrier ready. ${secondsLeft} seconds remained. Click Test barrier to finish the round.`;
         } else if (unlocked) {
           testButton.disabled = false;
           const hideProgress = avatarHidden ? 'Hidden' : atHideSpot ? 'At the blue spot: press E or Hide here' : 'Move to the blue hide spot';
@@ -773,7 +792,6 @@
       testing = true;
       banditInside = true;
       testButton.disabled = true;
-      resetButton.disabled = true;
       const placed = markerFill().filter(Boolean).length;
       const blocked = placed === targetSpots.length;
       bot.position.set(0, 0, -5.6);
@@ -794,42 +812,13 @@
           return;
         }
         testing = false;
-        testButton.disabled = timerExpired;
-        resetButton.disabled = false;
-        status.textContent = blocked
-          ? 'Barrier holds! The intruder is stuck at the furniture. Stay out of sight and follow responders.'
-          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The intruder got in. Stay hidden.`;
+        finishRound(blocked
+          ? 'Barrier holds! The intruder is stuck at the furniture.'
+          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The intruder got in.`);
       }
 
       requestAnimationFrame(moveBot);
     });
-
-    function reset() {
-      if (testing) return;
-      applyFurnitureRound();
-      doorHinge.rotation.y = 0;
-      bot.position.set(0, 0, -5.6);
-      bot.visible = false;
-      banditInside = false;
-      resetButton.disabled = false;
-      canvas.style.cursor = 'grab';
-      clearInterval(timerInterval);
-      timerInterval = null;
-      unlocked = false;
-      secondsLeft = 20;
-      timerExpired = false;
-      challengeComplete = false;
-      avatarHidden = false;
-      avatar.visible = true;
-      setLocation(false);
-      avatar.position.copy(avatarStart);
-      startTimerButton.disabled = false;
-      testButton.disabled = true;
-      updateCountdown();
-      updatePlacementStatus();
-    }
-
-    resetButton.addEventListener('click', reset);
 
     function resizeRenderer() {
       const bounds = canvas.getBoundingClientRect();
@@ -846,7 +835,7 @@
     renderer.setAnimationLoop(() => renderer.render(scene, camera));
     updatePlacementStatus();
 
-    return { reset, startChallenge };
+    return { startChallenge };
   }
 
   async function loadGame() {
