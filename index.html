@@ -313,7 +313,8 @@
     .primary:hover { box-shadow: 0 6px 0 #07547b; }
     .game .game-instruction { color: #d9edff; }
     .game > #next { display: block; margin-left: auto; }
-    .game #start-game { display: inline-block; margin-top: 7rem; text-decoration: none; }
+    .game #start-game { display: inline-block; margin-top: 1.5rem; text-decoration: none; }
+    .game .game-sign { color: #c05cff; font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 900; line-height: 1.2; margin: 1.5rem 0 0; text-shadow: 0 0 6px #c05cff, 0 0 14px #9d2cff, 0 0 28px #7a00ff; }
     .game #start-game.hidden, .game > #next.hidden { display: none; }
     #scene em { color: #ff5f00; font-size: clamp(2.5rem, 4.4vw, 3.2rem); font-style: normal; font-weight: 800; line-height: 1.15; text-shadow: 0 0 10px rgba(255, 95, 0, .55); }
     #scene p { color: #ff9ecb; font-size: clamp(1.3rem, 2.6vw, 1.8rem); font-weight: 700; line-height: 1.35; }
@@ -323,8 +324,8 @@
     .game .choice span { align-items: center; display: inline-flex; flex: none; font-size: 1em; height: 1.9em; justify-content: center; width: 1.9em; }
     .game-heading .kicker { font-size: clamp(1.4rem, 2.8vw, 2.2rem); letter-spacing: .04em; }
     .game-heading .game-instruction { font-size: clamp(1.25rem, 2.3vw, 1.8rem); font-weight: 700; }
-    .principle-grid article h3 { font-size: clamp(1.7rem, 3vw, 2.3rem); }
-    .principle-grid article p { color: #0f2540; font-size: clamp(1.15rem, 1.9vw, 1.4rem); font-weight: 600; line-height: 1.5; }
+    .principle-grid article h3 { color: #c80000; font-size: clamp(1.7rem, 3vw, 2.3rem); }
+    .principle-grid article p { color: #c80000; font-size: clamp(1.15rem, 1.9vw, 1.4rem); font-weight: 600; line-height: 1.5; }
     .game .scenario-grid .game-instruction { color: #9de8e5; font-size: clamp(1.05rem, 1.8vw, 1.3rem); font-weight: 700; line-height: 1.5; }
     button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #ffe04b; outline-offset: 3px; }
     .welcome-mark { background: #ed5b31; border: 4px solid #fff7df; box-shadow: 0 7px 0 rgba(131, 59, 14, .2); }
@@ -389,7 +390,7 @@
       <section class="intro"><div><p class="kicker">Practice together</p><h1>Find your safe next step.</h1><p>Leave only if it’s safe. If you can’t leave, hide. Get help when you can.</p><button id="start" class="primary">Start practice <span>→</span></button></div><aside><b>Need help now?</b><h2>Call local emergency services when safe.</h2><p>This is practice, not live help. Follow responder instructions.</p></aside></section>
       <section class="share-app" aria-labelledby="share-title"><div><p class="kicker">Share the app</p><h2 id="share-title">Practice anywhere.</h2><p>Scan to open on another device.</p><a id="share-link" href="#" target="_blank" rel="noopener">Open app link</a></div><img id="share-qr" class="share-qr" alt="QR code to open Stay Safe Steady" /></section>
       <section class="principles"><p class="kicker">Three safety steps</p><h2>Leave. Hide. Get help.</h2><div class="principle-grid"><article><b>01</b><h3>Get away</h3><p>Leave by a safe route. Leave your things.</p></article><article><b>02</b><h3>Get hidden</h3><p>If you can’t leave, get out of sight. Silence your phone.</p></article><article><b>03</b><h3>Get help</h3><p>When safe, call responders and share where you are.</p></article></div></section>
-      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Practice round</p><h2 id="questionTitle">What’s your safest next step?</h2><p class="game-instruction">Pause. Look. Choose.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div><div id="scene"></div><a id="start-game" class="primary hidden" href="game.html">Start game <span>→</span></a></div><div><p class="game-instruction">Safety rule: Leave only if it’s safe. Otherwise hide, stay quiet, and follow responders. Get help when safe.</p><p class="choice-label">What would you do?</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Next round →</button></section>
+      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Practice round</p><h2 id="questionTitle">What’s your safest next step?</h2><p class="game-instruction">Pause. Look. Choose.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div><div id="scene"></div><p class="game-sign">If you get three questions right in a row, you can play a game!</p><a id="start-game" class="primary hidden" href="game.html">Start game <span>→</span></a></div><div><p class="game-instruction">Safety rule: Leave only if it’s safe. Otherwise hide, stay quiet, and follow responders. Get help when safe.</p><p class="choice-label">What would you do?</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Next round →</button></section>
       <section class="special-game hidden" id="special-game">
         <div class="special-game-heading">
           <div>
