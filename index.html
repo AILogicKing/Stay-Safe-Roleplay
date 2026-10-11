@@ -314,6 +314,11 @@
     .game .game-instruction { color: #d9edff; }
     .game > #next { display: block; margin-left: auto; }
     .game > #start-game { display: block; margin: 14px 0 0 auto; text-decoration: none; width: max-content; }
+    .game > #next.hidden, .game > #start-game.hidden { display: none; }
+    #scene em { color: #ffbd69; font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-style: normal; font-weight: 800; }
+    #scene p { color: #ffffff; font-size: clamp(1.3rem, 2.6vw, 1.8rem); font-weight: 700; line-height: 1.35; }
+    #scene strong { color: #ffe04b; font-size: clamp(1.3rem, 2.6vw, 1.8rem); }
+    .game .scenario-grid .game-instruction { color: #9de8e5; font-size: clamp(1.05rem, 1.8vw, 1.3rem); font-weight: 700; line-height: 1.5; }
     button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #ffe04b; outline-offset: 3px; }
     .welcome-mark { background: #ed5b31; border: 4px solid #fff7df; box-shadow: 0 7px 0 rgba(131, 59, 14, .2); }
     .brand > b { background: #ed5b31; }
