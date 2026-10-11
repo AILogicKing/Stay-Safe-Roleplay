@@ -313,8 +313,8 @@
     .primary:hover { box-shadow: 0 6px 0 #07547b; }
     .game .game-instruction { color: #d9edff; }
     .game > #next { display: block; margin-left: auto; }
-    .game > #start-game { display: block; margin: 14px 0 0 auto; text-decoration: none; width: max-content; }
-    .game > #next.hidden, .game > #start-game.hidden { display: none; }
+    .game #start-game { display: inline-block; margin-top: 7rem; text-decoration: none; }
+    .game #start-game.hidden, .game > #next.hidden { display: none; }
     #scene em { color: #ff5f00; font-size: clamp(2.5rem, 4.4vw, 3.2rem); font-style: normal; font-weight: 800; line-height: 1.15; text-shadow: 0 0 10px rgba(255, 95, 0, .55); }
     #scene p { color: #ff9ecb; font-size: clamp(1.3rem, 2.6vw, 1.8rem); font-weight: 700; line-height: 1.35; }
     #scene strong { color: #ffe04b; font-size: clamp(1.3rem, 2.6vw, 1.8rem); }
@@ -385,7 +385,7 @@
       <section class="intro"><div><p class="kicker">Practice together</p><h1>Find your safe next step.</h1><p>Leave only if it’s safe. If you can’t leave, hide. Get help when you can.</p><button id="start" class="primary">Start practice <span>→</span></button></div><aside><b>Need help now?</b><h2>Call local emergency services when safe.</h2><p>This is practice, not live help. Follow responder instructions.</p></aside></section>
       <section class="share-app" aria-labelledby="share-title"><div><p class="kicker">Share the app</p><h2 id="share-title">Practice anywhere.</h2><p>Scan to open on another device.</p><a id="share-link" href="#" target="_blank" rel="noopener">Open app link</a></div><img id="share-qr" class="share-qr" alt="QR code to open Stay Safe Steady" /></section>
       <section class="principles"><p class="kicker">Three safety steps</p><h2>Leave. Hide. Get help.</h2><div class="principle-grid"><article><b>01</b><h3>Get away</h3><p>Leave by a safe route. Leave your things.</p></article><article><b>02</b><h3>Get hidden</h3><p>If you can’t leave, get out of sight. Silence your phone.</p></article><article><b>03</b><h3>Get help</h3><p>When safe, call responders and share where you are.</p></article></div></section>
-      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Practice round</p><h2 id="questionTitle">What’s your safest next step?</h2><p class="game-instruction">Pause. Look. Choose.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div id="scene"></div><div><p class="game-instruction">Safety rule: Leave only if it’s safe. Otherwise hide, stay quiet, and follow responders. Get help when safe.</p><p class="choice-label">What would you do?</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Next round →</button><a id="start-game" class="primary hidden" href="game.html">Start game <span>→</span></a></section>
+      <section class="game" id="game"><div class="game-heading"><div><p class="kicker">Practice round</p><h2 id="questionTitle">What’s your safest next step?</h2><p class="game-instruction">Pause. Look. Choose.</p></div><span id="scenario">01</span></div><div class="scenario-grid"><div><div id="scene"></div><a id="start-game" class="primary hidden" href="game.html">Start game <span>→</span></a></div><div><p class="game-instruction">Safety rule: Leave only if it’s safe. Otherwise hide, stay quiet, and follow responders. Get help when safe.</p><p class="choice-label">What would you do?</p><div id="choices"></div><p id="feedback" aria-live="polite"></p></div></div><button id="next" class="secondary hidden">Next round →</button></section>
       <section class="special-game hidden" id="special-game">
         <div class="special-game-heading">
           <div>

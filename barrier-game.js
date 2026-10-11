@@ -430,7 +430,8 @@
       shoe.castShadow = true;
       bot.add(shoe);
     }
-    bot.position.set(0, 0, -3.92);
+    bot.position.set(0, 0, -5.6);
+    bot.visible = false;
 
     const avatar = new THREE.Group();
     scene.add(avatar);
@@ -526,6 +527,7 @@
     corridorBeacon.position.set(corridorSpot.x, 0.64, corridorSpot.z);
     scene.add(corridorBeacon);
     let inCorridor = false;
+    let banditInside = false;
 
     function setLocation(corridor) {
       inCorridor = corridor;
@@ -629,6 +631,10 @@
       }
 
       if (nextZ < -4.2 && Math.abs(nextX) < 1) {
+        if (banditInside) {
+          status.textContent = "The intruder is in the room. You can't go outside!";
+          return;
+        }
         const placed = markerFill().filter(Boolean).length;
         if (placed === targetSpots.length) {
           status.textContent = 'The door is blocked by furniture. Move a piece away to go out.';
@@ -760,21 +766,29 @@
 
     testButton.addEventListener('click', () => {
       if (testing || !unlocked || timerExpired) return;
+      if (inCorridor) {
+        status.textContent = 'Go back into the classroom to test the barrier.';
+        return;
+      }
       testing = true;
+      banditInside = true;
       testButton.disabled = true;
       resetButton.disabled = true;
       const placed = markerFill().filter(Boolean).length;
       const blocked = placed === targetSpots.length;
+      bot.position.set(0, 0, -5.6);
+      bot.visible = true;
+      doorHinge.rotation.y = 0;
       const startZ = bot.position.z;
       const endZ = blocked ? -3.12 : 0.9;
       const startTime = performance.now();
-      status.textContent = 'The friendly practice bot is checking the doorway...';
+      status.textContent = "The intruder is coming in! You can't go outside.";
 
       function moveBot(now) {
-        const progress = Math.min((now - startTime) / 1500, 1);
+        const progress = Math.min((now - startTime) / 2000, 1);
         const eased = progress * progress * (3 - 2 * progress);
         bot.position.z = THREE.MathUtils.lerp(startZ, endZ, eased);
-        if (!blocked) doorHinge.rotation.y = -1.15 * eased;
+        doorHinge.rotation.y = -1.15 * Math.min(progress / 0.4, 1);
         if (progress < 1) {
           requestAnimationFrame(moveBot);
           return;
@@ -783,8 +797,8 @@
         testButton.disabled = timerExpired;
         resetButton.disabled = false;
         status.textContent = blocked
-          ? 'Barrier holds! The practice bot stopped at the furniture. Stay out of sight and follow responders.'
-          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The bot reached the doorway.`;
+          ? 'Barrier holds! The intruder is stuck at the furniture. Stay out of sight and follow responders.'
+          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The intruder got in. Stay hidden.`;
       }
 
       requestAnimationFrame(moveBot);
@@ -794,7 +808,9 @@
       if (testing) return;
       applyFurnitureRound();
       doorHinge.rotation.y = 0;
-      bot.position.set(0, 0, -3.92);
+      bot.position.set(0, 0, -5.6);
+      bot.visible = false;
+      banditInside = false;
       resetButton.disabled = false;
       canvas.style.cursor = 'grab';
       clearInterval(timerInterval);
