@@ -11,6 +11,7 @@
   const countdown = document.getElementById('barrier-countdown');
   const testButton = document.getElementById('barrier-test');
   const hideButton = document.getElementById('avatar-hide');
+  const runAlert = document.getElementById('run-alert');
   if (!section || !canvas || !startTimerButton || !status || !countdown || !testButton || !hideButton) return;
 
   let game;
@@ -500,6 +501,49 @@
     const hideBeaconLight = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), materials.glow);
     hideBeaconLight.position.set(hideSpot.x, 1.36, hideSpot.z);
     scene.add(hideBeaconLight);
+    [hideMarker, hideBeacon, hideBeaconLight].forEach((mesh) => { mesh.visible = false; });
+
+    // Random hiding spots: behind a bookcase or under a table.
+    const hideSpots = [];
+    const spotKinds = ['bookcase', 'table', Math.random() < 0.5 ? 'bookcase' : 'table'];
+    for (let attempt = 0; attempt < 300 && hideSpots.length < spotKinds.length; attempt += 1) {
+      const x = randomBetween(-3.6, 3.6);
+      const z = randomBetween(-1.0, 2.6);
+      const clear = hideSpots.every((other) => Math.hypot(other.x - x, other.z - z) > 2.2)
+        && furnitureRound.starts.every(([startX, startZ]) => Math.hypot(startX - x, startZ - z) > 2)
+        && Math.hypot(avatarStart.x - x, avatarStart.z - z) > 1.2;
+      if (clear) hideSpots.push({ x, z, kind: spotKinds[hideSpots.length] });
+    }
+    hideSpots.forEach((spot) => {
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.68, 32), makeMaterial('#35c8d0', { side: THREE.DoubleSide, emissive: '#087f89', emissiveIntensity: 0.55 }));
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(spot.x, 0.04, spot.z);
+      scene.add(ring);
+      const prop = new THREE.Group();
+      scene.add(prop);
+      if (spot.kind === 'bookcase') {
+        prop.position.set(spot.x, 0, spot.z + 0.7);
+        addBox(prop, [1.3, 1.7, 0.06], materials.wood, [0, 0.85, -0.2]);
+        addBox(prop, [0.06, 1.7, 0.5], materials.wood, [-0.62, 0.85, 0]);
+        addBox(prop, [0.06, 1.7, 0.5], materials.wood, [0.62, 0.85, 0]);
+        for (const boardY of [0.05, 0.55, 1.05, 1.55, 1.7]) addBox(prop, [1.3, 0.05, 0.5], materials.woodLight, [0, boardY, 0]);
+        [0.075, 0.575, 1.075].forEach((baseY, row) => {
+          for (let book = 0; book < 8; book += 1) {
+            const height = 0.28 + ((book * 7 + row * 3) % 4) * 0.04;
+            addBox(prop, [0.1, height, 0.3], makeMaterial(noteColors[(book + row * 2) % noteColors.length]), [-0.5 + book * 0.14, baseY + height / 2, -0.02], false);
+          }
+        });
+      } else {
+        prop.position.set(spot.x, 0, spot.z);
+        addBox(prop, [1.5, 0.1, 0.9], makeMaterial('#ed8a3d'), [0, 0.8, 0]);
+        for (const legX of [-0.65, 0.65]) {
+          for (const legZ of [-0.36, 0.36]) addBox(prop, [0.08, 0.76, 0.08], materials.trim, [legX, 0.38, legZ], false);
+        }
+      }
+      const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 12), materials.glow);
+      beacon.position.set(spot.x, 2.0, spot.z + (spot.kind === 'bookcase' ? 0.7 : 0));
+      scene.add(beacon);
+    });
 
     // Corridor sits far behind the classroom door so the same scene can swap views.
     const corridorSpot = new THREE.Vector3(2.1, 0, -31.2);
@@ -551,6 +595,8 @@
     const dragPoint = new THREE.Vector3();
     let dragging = null;
     let testing = false;
+    let chasing = false;
+    let lastMoveAt = 0;
 
     function updatePointer(event) {
       const rect = canvas.getBoundingClientRect();
@@ -573,9 +619,13 @@
       });
     }
 
+    function nearestHideSpot() {
+      const spots = inCorridor ? [{ x: corridorSpot.x, z: corridorSpot.z }] : hideSpots;
+      return spots.find((spot) => Math.hypot(avatar.position.x - spot.x, avatar.position.z - spot.z) < 0.8);
+    }
+
     function isAtHideSpot() {
-      const spot = inCorridor ? corridorSpot : hideSpot;
-      return Math.hypot(avatar.position.x - spot.x, avatar.position.z - spot.z) < 0.78;
+      return Boolean(nearestHideSpot());
     }
 
     function updateCountdown() {
@@ -596,7 +646,7 @@
       avatar.position.copy(avatarStart);
       startTimerButton.disabled = true;
       testButton.disabled = false;
-      status.textContent = '20 seconds: hide and block the door, or walk out the door to the main corridor.';
+      status.textContent = '20 seconds: hide behind a bookcase or under a table (hold E) and block the door, or walk out to the corridor.';
       updateCountdown();
       updatePlacementStatus();
 
@@ -616,6 +666,10 @@
 
     function moveAvatar(dx, dz) {
       if (!unlocked || timerExpired || challengeComplete) return;
+      const moveTime = performance.now();
+      if (chasing && moveTime - lastMoveAt < 90) return;
+      lastMoveAt = moveTime;
+      cancelHold();
       avatarHidden = false;
       avatar.visible = true;
       const nextX = avatar.position.x + dx;
@@ -659,7 +713,7 @@
     function hideAvatar() {
       if (!unlocked || timerExpired || challengeComplete) return;
       if (!isAtHideSpot()) {
-        status.textContent = 'Move your avatar to the blue floor marker, then hide.';
+        status.textContent = 'Move to a glowing hiding spot (behind a bookcase or under a table), then hold E.';
         return;
       }
       avatarHidden = true;
@@ -673,7 +727,29 @@
         moveAvatar(dx * 0.55, dz * 0.55);
       });
     });
-    hideButton.addEventListener('click', hideAvatar);
+    let holdTimer = null;
+    function cancelHold() {
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+    }
+    function startHide() {
+      if (holdTimer || !unlocked || timerExpired || challengeComplete || avatarHidden) return;
+      if (!isAtHideSpot()) {
+        status.textContent = 'Move to a glowing hiding spot (behind a bookcase or under a table), then hold E.';
+        return;
+      }
+      holdTimer = setTimeout(() => {
+        holdTimer = null;
+        hideAvatar();
+      }, 500);
+    }
+    hideButton.addEventListener('pointerdown', startHide);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((type) => hideButton.addEventListener(type, cancelHold));
+    window.addEventListener('keyup', (event) => {
+      if (event.key.toLowerCase() === 'e') cancelHold();
+    });
 
     window.addEventListener('keydown', (event) => {
       if (!unlocked || (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]'))) return;
@@ -689,15 +765,20 @@
         moveAvatar(...moves[key]);
         event.preventDefault();
       } else if (key === 'e') {
-        hideAvatar();
+        if (!event.repeat) startHide();
         event.preventDefault();
       }
     });
 
     let roundFinished = false;
+    function setRun(show) {
+      if (runAlert) runAlert.classList.toggle('hidden', !show);
+    }
     function finishRound(message) {
       if (roundFinished) return;
       roundFinished = true;
+      chasing = false;
+      setRun(false);
       unlocked = false;
       clearInterval(timerInterval);
       timerInterval = null;
@@ -707,6 +788,34 @@
       startTimerButton.disabled = true;
       status.textContent = `${message} Round over. Heading back to the quiz lobby...`;
       setTimeout(() => location.assign('index.html#lobby'), 4000);
+    }
+
+    // The intruder runs at the avatar until it hides, catches up, or gives up.
+    function startChase() {
+      chasing = true;
+      status.textContent = 'RUN! Reach a glowing hiding spot and hold E for half a second.';
+      const chaseStart = performance.now();
+      let last = chaseStart;
+      function step(now) {
+        if (!chasing) return;
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        const dx = avatar.position.x - bot.position.x;
+        const dz = avatar.position.z - bot.position.z;
+        const dist = Math.hypot(dx, dz);
+        const end = (message) => {
+          testing = false;
+          finishRound(message);
+        };
+        if (avatarHidden) return end('You hid in time! The intruder lost track of you.');
+        if (dist < 0.6) return end('The intruder caught up with you. Get to a hiding spot sooner next time.');
+        if (now - chaseStart > 15000) return end('The intruder cornered you. Find a hiding spot faster next time.');
+        bot.position.x += (dx / dist) * 2.3 * dt;
+        bot.position.z += (dz / dist) * 2.3 * dt;
+        bot.rotation.y = Math.atan2(dx, dz);
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
 
     function updatePlacementStatus() {
@@ -738,7 +847,7 @@
           status.textContent = `Barrier ready. ${secondsLeft} seconds remained. Click Test barrier to finish the round.`;
         } else if (unlocked) {
           testButton.disabled = false;
-          const hideProgress = avatarHidden ? 'Hidden' : atHideSpot ? 'At the blue spot: press E or Hide here' : 'Move to the blue hide spot';
+          const hideProgress = avatarHidden ? 'Hidden' : atHideSpot ? 'Hold E for half a second to hide here' : 'Find a glowing hiding spot (behind a bookcase or under a table)';
           status.textContent = inCorridor
             ? `Main corridor: hide at the blue marker by the lockers on the right. ${hideProgress}.`
             : `Round ${furnitureRoundIndex + 1}: ${furnitureRound.kinds.join(' + ')}. ${hideProgress}. Barrier ${placed} of 2.`;
@@ -791,6 +900,8 @@
       }
       testing = true;
       banditInside = true;
+      clearInterval(timerInterval);
+      timerInterval = null;
       testButton.disabled = true;
       const placed = markerFill().filter(Boolean).length;
       const blocked = placed === targetSpots.length;
@@ -811,10 +922,20 @@
           requestAnimationFrame(moveBot);
           return;
         }
-        testing = false;
-        finishRound(blocked
-          ? 'Barrier holds! The intruder is stuck at the furniture.'
-          : `Barrier incomplete: ${placed} of ${targetSpots.length} pieces in place. The intruder got in.`);
+        if (blocked) {
+          testing = false;
+          finishRound('Barrier holds! The intruder is stuck at the furniture.');
+          return;
+        }
+        setRun(true);
+        if (avatarHidden) {
+          setTimeout(() => {
+            testing = false;
+            finishRound('The barrier failed, but you stayed hidden. The intruder did not find you.');
+          }, 1500);
+          return;
+        }
+        startChase();
       }
 
       requestAnimationFrame(moveBot);

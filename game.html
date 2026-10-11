@@ -51,6 +51,12 @@
     #barrier-start-timer, #barrier-test { background: var(--blue); box-shadow: 0 4px 0 #07547b; color: white; }
     .barrier-actions button:disabled, #avatar-hide:disabled { cursor: not-allowed; opacity: .55; }
     #avatar-hide { background: transparent; border: 2px solid var(--blue); border-radius: 9px; color: var(--blue); font-weight: 800; padding: 11px; }
+    .hidden { display: none !important; }
+    .barrier-canvas-shell { position: relative; }
+    .game-heading p, .barrier-controls .directions { font-size: clamp(1.2rem, 1.9vw, 1.45rem); line-height: 1.5; }
+    .directions strong { color: var(--orange); }
+    .run-alert { align-items: center; animation: run-pulse .45s ease-in-out infinite alternate; color: #ff2b2b; display: flex; font-size: clamp(4rem, 14vw, 9rem); font-weight: 900; inset: 0; justify-content: center; -webkit-text-stroke: 8px #fff; paint-order: stroke fill; pointer-events: none; position: absolute; }
+    @keyframes run-pulse { to { transform: scale(1.12); } }
     button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 
     @media (max-width: 760px) {
@@ -86,15 +92,16 @@
         <div class="barrier-layout">
           <div class="barrier-canvas-shell">
             <canvas id="barrier-canvas" aria-label="Three-dimensional classroom. Move your avatar to the blue hiding spot and drag the random furniture pieces to the doorway markers."></canvas>
+            <div id="run-alert" class="run-alert hidden" role="alert">RUN!</div>
           </div>
           <div class="barrier-controls">
             <p id="barrier-countdown" aria-live="off">Ready when you are</p>
-            <p>Move with WASD, arrow keys, or the buttons. Hide at the blue spot and drag any two pieces of furniture to the doorway, or walk out the door to the main corridor. Once you click Test barrier, the intruder comes in and you can't go outside.</p>
+            <p class="directions"><strong>Directions:</strong> Move with WASD, arrow keys, or the buttons. Find a glowing hiding spot behind a bookcase or under a table and hold E for half a second to hide. Drag any two pieces of furniture to the doorway to block the door, or walk out the door to the main corridor. When you click Test barrier, the intruder comes in. If the barrier doesn't hold, RUN! and hide before it catches you.</p>
             <div class="avatar-controls" aria-label="Move your avatar">
               <span></span><button type="button" data-avatar-move="0,-1" aria-label="Move up">▲</button><span></span>
               <button type="button" data-avatar-move="-1,0" aria-label="Move left">◀</button><button type="button" data-avatar-move="0,1" aria-label="Move down">▼</button><button type="button" data-avatar-move="1,0" aria-label="Move right">▶</button>
             </div>
-            <button id="avatar-hide" type="button" disabled>Hide here (E)</button>
+            <button id="avatar-hide" type="button" disabled>Hold to hide (E)</button>
             <p id="barrier-status" role="status" aria-live="polite">3D classroom loading...</p>
             <div class="barrier-actions">
               <button id="barrier-start-timer" type="button">Start timer</button>
