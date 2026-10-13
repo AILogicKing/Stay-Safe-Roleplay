@@ -577,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
       $('sg-feedback-msg').textContent = `${roomLayouts[sgLevel].labels[0]}. Pick your spot and actions.`;
     });
   }
-  $('alert-form').addEventListener('submit', (event) => { event.preventDefault(); const contact = $('contact').value.trim() || 'your trusted contact'; const where = $('where').value.trim() || 'my current location'; $('preview').textContent = `Preview: “Hi ${contact}, I am safe at ${where}. I am following responder instructions.”`; });
+  $('alert-form').addEventListener('submit', (event) => { event.preventDefault(); const contact = $('contact').value.trim() || 'your trusted contact'; const where = $('where').value.trim() || 'my current location'; $('preview').textContent = `Preview: “Hi ${contact}, I am safe at ${where}. I am following responder instructions.”`; $('preview').classList.add('has-preview'); });
   initSpecialGame();
   render();
   if (location.hash === '#lobby') document.getElementById('continue').click();
